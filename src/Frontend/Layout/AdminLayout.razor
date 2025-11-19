@@ -1,0 +1,37 @@
+﻿@using Frontend.Layout.Admin
+@inherits LayoutComponentBase
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <AdminNavMenu></AdminNavMenu>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Topbar -->
+            <AdminTopBaar></AdminTopBaar>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                @Body
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <AdminFooter></AdminFooter>
+        <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->

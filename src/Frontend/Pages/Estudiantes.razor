@@ -1,0 +1,168 @@
+﻿@page "/estudiantes"
+@using Frontend.Models
+@using Frontend.Services
+
+@inject EstudianteService Service
+<h3>Estudiantes</h3>
+
+@if (!string.IsNullOrEmpty(NotificationMessage))
+{
+    <div class="alert @NotificationClass" role="alert">
+        @NotificationMessage
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@(_editing ? "Editar Estudiante" : "Crear Estudiante")</h5>
+
+        <EditForm Model="formModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-2">
+                <label class="form-label">Nombre</label>
+                <InputText class="form-control" @bind-Value="formModel.Nombre" />
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">Dirección</label>
+                <InputText class="form-control" @bind-Value="formModel.Direccion" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">@(_editing ? "Guardar cambios" : "Crear")</button>
+            @if (_editing)
+            {
+                <button type="button" class="btn btn-secondary ms-2" @onclick="CancelEdit">Cancelar</button>
+            }
+        </EditForm>
+    </div>
+</div>
+
+@if (items is null)
+{
+    <p>Cargando...</p>
+}
+else if (items.Count == 0)
+{
+    <p>No hay estudiantes.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in items)
+            {
+                <tr>
+                    <td>@e.Id</td>
+                    <td>@e.Nombre</td>
+                    <td>@e.Direccion</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => StartEdit(e)">Editar</button>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(e.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Estudiante>? items;
+    private Estudiante formModel = new();
+    private bool _editing = false;
+    private string NotificationMessage = string.Empty;
+    private string NotificationClass = "alert-success";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        try
+        {
+            items = await Service.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowNotification("Error cargando estudiantes: " + ex.Message, "alert-danger");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            bool ok;
+            if (_editing)
+            {
+                ok = await Service.UpdateAsync(formModel);
+                if (ok) ShowNotification("Estudiante actualizado", "alert-success");
+                else ShowNotification("No se pudo actualizar", "alert-warning");
+            }
+            else
+            {
+                ok = await Service.CreateAsync(formModel);
+                if (ok) ShowNotification("Estudiante creado", "alert-success");
+                else ShowNotification("No se pudo crear", "alert-warning");
+            }
+
+            if (ok)
+            {
+                formModel = new Estudiante();
+                _editing = false;
+                await Load();
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowNotification("Error: " + ex.Message, "alert-danger");
+        }
+    }
+
+    private void StartEdit(Estudiante e)
+    {
+        formModel = new Estudiante { Id = e.Id, Nombre = e.Nombre, Direccion = e.Direccion };
+        _editing = true;
+    }
+
+    private void CancelEdit()
+    {
+        formModel = new Estudiante();
+        _editing = false;
+    }
+
+    private async Task ConfirmDelete(int id)
+    {
+        if (!await JSConfirm($"Eliminar estudiante {id}?")) return;
+        var ok = await Service.DeleteAsync(id);
+        if (ok) { ShowNotification("Eliminado", "alert-success"); await Load(); }
+        else ShowNotification("No se pudo eliminar", "alert-warning");
+    }
+
+    // Small JS confirm interop
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    private async Task<bool> JSConfirm(string message) => await JS.InvokeAsync<bool>("confirm", message);
+
+    private void ShowNotification(string msg, string cssClass)
+    {
+        NotificationMessage = msg;
+        NotificationClass = cssClass;
+        StateHasChanged();
+        _ = Task.Delay(4000).ContinueWith(_ =>
+        {
+            NotificationMessage = string.Empty;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+}
