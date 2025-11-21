@@ -131,3 +131,12 @@
 /Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/tr/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+/Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/Microsoft.IdentityModel.Logging.dll
+/Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.dll
+/Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/Microsoft.IdentityModel.Tokens.dll
+/Users/fabianvilla/demo/src/ApiService/bin/Debug/net9.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/fabianvilla/demo/src/ApiService/obj/Debug/net9.0/ApiService.sourcelink.json

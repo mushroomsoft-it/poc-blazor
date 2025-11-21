@@ -1,7 +1,8 @@
 ﻿@page "/estudiantes"
 @using Frontend.Models
 @using Frontend.Services
-
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @inject EstudianteService Service
 <h3>Estudiantes</h3>
 

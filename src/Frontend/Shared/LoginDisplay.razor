@@ -1,0 +1,36 @@
+﻿@using Frontend.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@inject Microsoft.Extensions.Options.IOptions<OidcSettings> OidcConfig
+
+<AuthorizeView>
+    <Authorized>
+        <button class="btn btn-link" @onclick="BeginLogout">Logout</button>
+    </Authorized>
+    <NotAuthorized>
+        <button class="btn btn-link" @onclick="BeginLogin">Login</button>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private void BeginLogin()
+    {
+        Navigation.NavigateTo("authentication/login");
+    }
+
+    private async Task BeginLogout()
+    {
+        var authority = OidcConfig.Value.Authority;
+        var clientId = OidcConfig.Value.ClientId;
+        var logoutCallback = OidcConfig.Value.PostLogoutRedirectUri;
+
+        var url = $"{authority}/logout?" +
+        $"client_id={clientId}&" +
+        $"logout_uri={Uri.EscapeDataString(logoutCallback)}";
+
+        await JSRuntime.InvokeVoidAsync("sessionStorage.clear");
+
+        Navigation.NavigateTo(url); // forceLoad -> navegación externa
+    }
+}

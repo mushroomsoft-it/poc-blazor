@@ -1,16 +1,31 @@
 using System;
 using System.Net.Http.Json;
 using Frontend.Models;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 namespace Frontend.Services;
 
 public class EstudianteService
 {
     private readonly HttpClient _http;
-    public EstudianteService(HttpClient http) => _http = http;
+    private readonly IAccessTokenProvider _tokenProvider;
+    public EstudianteService(HttpClient http, IAccessTokenProvider tokenProvider)
+    {
+        _http = http;
+        _tokenProvider = tokenProvider;
+    }
 
     public async Task<List<Estudiante>> GetAllAsync()
-        => await _http.GetFromJsonAsync<List<Estudiante>>("api/estudiante") ?? new();
+    {
+        var result = await _tokenProvider.RequestAccessToken();
+        if (result.TryGetToken(out var token))
+        {
+            _http.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Value);
+        }
+        return await _http.GetFromJsonAsync<List<Estudiante>>("api/estudiante") ?? new();
+    }
+
 
     public async Task<Estudiante?> GetByIdAsync(int id)
     {

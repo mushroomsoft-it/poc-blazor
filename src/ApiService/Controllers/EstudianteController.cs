@@ -2,6 +2,7 @@ using ApiService.Data;
 using ApiService.Dtos;
 using ApiService.Models;
 using ApiService.Respositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,8 @@ namespace ApiService.Controllers
             _repo = repo;
             _log = log;
         }
+
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
