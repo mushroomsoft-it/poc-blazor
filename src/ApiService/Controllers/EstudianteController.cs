@@ -21,7 +21,7 @@ namespace ApiService.Controllers
             _log = log;
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

@@ -28,7 +28,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("https://localhost:7002") // Blazor WASM
+                .WithOrigins(builder.Configuration["CorsOrigins"].Split(",")) // Blazor WASM
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -37,18 +37,18 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_EeqWWrY3m";
-        options.Audience = "6fegfdpu7vtfa6cnut0cdpic5h"; // ClientId
+        options.Authority = builder.Configuration["AWS:Authority"]; // Cognito User Pool URL
+        options.Audience = builder.Configuration["AWS:Audience"]; // ClientId
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_EeqWWrY3m",
-
+            ValidIssuer = options.Authority,
             ValidateAudience = false,
-
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
+            ValidateIssuerSigningKey = true,
+            NameClaimType = "cognito:username",
+            RoleClaimType = "cognito:groups"
         };
     });
 
