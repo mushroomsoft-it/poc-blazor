@@ -1,0 +1,37 @@
+name: Build Full Solution
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build
+
+      - name: Publish API
+        run: dotnet publish src/ApiService/ApiService.csproj -c Release -o publish/api
+
+      - name: Publish Blazor
+        run: dotnet publish src/Frontend/Frontend.csproj -c Release -o publish/blazor
+
+      - name: Upload all
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-build
+          path: publish
