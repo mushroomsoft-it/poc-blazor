@@ -1,0 +1,34 @@
+# Normalización de saltos de línea
+* text=auto eol=lf
+
+# Archivos C#
+*.cs diff=csharp
+
+# Evitar mostrar diffs de archivos binarios
+*.dll binary
+*.exe binary
+*.pdf binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+
+# Archivos de publish
+publish/* binary
+
+# Archivos WASM
+*.wasm binary
+*.br binary
+*.gz binary
+
+# JSON debe conservarse como texto
+*.json text
+
+# Evitar conflictos en locks
+project.assets.json merge=union
+
+# Forzar UTF-8
+*.cs text working-tree-encoding=UTF-8
+*.razor text working-tree-encoding=UTF-8
+*.json text working-tree-encoding=UTF-8
