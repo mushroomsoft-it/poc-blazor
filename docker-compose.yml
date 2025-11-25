@@ -32,11 +32,11 @@ services:
       - "443:443"
     environment:
       - BaseUrl=http://localhost:8080
-      - Authority=https://blazor-demo-app.auth.us-east-1.amazoncognito.com
-      - ClientId=6fegfdpu7vtfa6cnut0cdpic5h
+      - Authority=https://app-name.auth.region.amazoncognito.com
+      - ClientId=xxxxxxxxx
       - RedirectUri=https://localhost/authentication/login-callback
       - PostLogoutRedirectUri=https://localhost/
-      - MetadataUrl=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_EeqWWrY3m/.well-known/openid-configuration
+      - MetadataUrl=https://domain-aws/pool_id/.well-known/openid-configuration
     depends_on:
       - api
 
