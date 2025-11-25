@@ -1,0 +1,18 @@
+{
+  "BaseUrl": "${BaseUrl}",
+  "Authentication": {
+    "AWS": {
+      "Authority": "${Authority}",
+      "ClientId": "${ClientId}",
+      "RedirectUri": "${RedirectUri}",
+      "PostLogoutRedirectUri": "${PostLogoutRedirectUri}",
+      "ResponseType": "code",
+      "DefaultScopes": [
+        "openid",
+        "profile",
+        "email"
+      ],
+      "MetadataUrl": "${MetadataUrl}"
+    }
+  }
+}
