@@ -70,7 +70,14 @@ app.UseCors("AllowBlazor");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
 
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate(); // Ejecuta TODAS las migraciones pendientes
+}
+
+app.MapControllers();
 
 app.Run();
