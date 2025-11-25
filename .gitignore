@@ -5,22 +5,25 @@
 Thumbs.db
 *.log
 logs/
+*.tmp
+tmp/
 
 ###################################
 ###          DOTNET            ###
 ###################################
+# Build
 bin/
 obj/
-*.dll
-*.pdb
-*.mdb
-*.Cache/
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+artifacts/
 
-# Razor generated files
+# Evitar ignorar DLL globalmente (importante para Blazor)
+# *.dll  <-- Eliminado
+
+# DLL generadas dentro de compilación
+bin/**/*.dll
+obj/**/*.dll
+
+# Razor
 *.razor.g.cs
 *.razor.rz.scp.css
 
@@ -30,21 +33,24 @@ obj/
 packages/
 project.lock.json
 project.fragment.lock.json
-artifacts/
 
 ###################################
-###         FRONTEND           ###
+###           BLAZOR           ###
 ###################################
-# Node / JS tools (si usas Vite, npm, tailwind, etc.)
+# Archivos de desarrollo
+*.map
+
+# Publicaciones (publish / build)
+publish/
+build/
+out/
+
+# Node / JS tools (si usas Tailwind, Vite, etc.)
 src/Frontend/node_modules/
 src/Frontend/dist/
 src/Frontend/build/
-npm-debug.log
-yarn-error.log
 
-# Blazor publish
-src/Frontend/bin/
-src/Frontend/obj/
+# Blazor wwwroot
 src/Frontend/wwwroot/*.map
 
 ###################################
@@ -62,8 +68,12 @@ volumes/
 *.tar
 docker-compose.override.yml
 
+# Nginx runtime
+nginx/logs/
+nginx/cache/
+
 ###################################
-###        CERTIFICADOS        ###
+###         CERTIFICADOS       ###
 ###################################
 certs/
 *.crt
@@ -77,5 +87,3 @@ certs/
 *.env
 .env.*
 !.env.example
-
-###
