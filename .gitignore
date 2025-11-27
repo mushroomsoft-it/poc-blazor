@@ -22,6 +22,8 @@ artifacts/
 # DLL generadas dentro de compilación
 bin/**/*.dll
 obj/**/*.dll
+src/**/bin/**/net9.0/*.dll
+src/**/obj/**/net9.0/*.dll
 
 # Razor
 *.razor.g.cs
@@ -45,10 +47,6 @@ publish/
 build/
 out/
 
-# Node / JS tools (si usas Tailwind, Vite, etc.)
-src/Frontend/node_modules/
-src/Frontend/dist/
-src/Frontend/build/
 
 # Blazor wwwroot
 src/Frontend/wwwroot/*.map
@@ -56,8 +54,8 @@ src/Frontend/wwwroot/*.map
 ###################################
 ###         API SERVICE        ###
 ###################################
-src/ApiService/bin/
-src/ApiService/obj/
+src/ApiService/bin/*
+src/ApiService/obj/*
 src/ApiService/wwwroot/*.map
 
 ###################################
@@ -68,9 +66,6 @@ volumes/
 *.tar
 docker-compose.override.yml
 
-# Nginx runtime
-nginx/logs/
-nginx/cache/
 
 ###################################
 ###         CERTIFICADOS       ###
@@ -81,9 +76,3 @@ certs/
 *.pem
 *.pfx
 
-###################################
-###      ENV files (secret)    ###
-###################################
-*.env
-.env.*
-!.env.example
