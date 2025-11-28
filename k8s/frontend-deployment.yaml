@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: efaby10/app-blazor:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: BaseUrl
+              value: "http://api"
+            - name: Authority
+              value: "https://blazor-demo-app.auth.us-east-1.amazoncognito.com"
+            - name: ClientId
+              value: "6fegfdpu7vtfa6cnut0cdpic5h"
+            - name: RedirectUri
+              value: "https://blazor.local/authentication/login-callback"
+            - name: PostLogoutRedirectUri
+              value: "https://blazor.local/"
+            - name: MetadataUrl
+              value: "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_EeqWWrY3m/.well-known/openid-configuration"

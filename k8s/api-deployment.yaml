@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: efaby10/api-service:latest
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              value: "Host=postgres;Database=mydb;Username=postgres;Password=postgres"
+          ports:
+            - containerPort: 80
