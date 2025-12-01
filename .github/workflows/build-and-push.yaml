@@ -41,15 +41,9 @@ jobs:
       - name: Push api
         run: docker push $REGISTRY/${API_IMAGE}:latest
 
-      - name: Trigger Deploy workflow
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const workflow = "deply-eks.yml"; 
-            const ref = "dev";
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: workflow,
-              ref: ref,
-            });
+  deploy:
+    needs: build
+    uses: ./.github/workflows/deploy-eks.yaml
+    with:
+      image_frontend: ghcr.io/${{ github.repository }}-frontend:latest
+      image_api: ghcr.io/${{ github.repository }}-api:latest
