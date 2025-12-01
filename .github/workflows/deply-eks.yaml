@@ -1,9 +1,10 @@
 name: Deploy both services to EKS
 
 on:
-  push:
-    branches: ["main"]
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build and publish both Docker images"]
+    types:
+      - completed
 
 permissions:
   id-token: write
