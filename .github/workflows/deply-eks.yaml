@@ -1,0 +1,47 @@
+name: Deploy both services to EKS
+
+on:
+  push:
+    branches: ["dev"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployRole
+          aws-region: us-east-1
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name demo-eks
+
+      - name: Replace environment vars
+        run: |
+          sed -i "s|\${AUTHORITY}|${{ secrets.AUTHORITY }}|g" k8s/frontend-deployment.yaml
+          sed -i "s|\${CLIENT_ID}|${{ secrets.CLIENT_ID }}|g" k8s/frontend-deployment.yaml
+          sed -i "s|\${REDIRECT_URI}|${{ secrets.REDIRECT_URI }}|g" k8s/frontend-deployment.yaml
+          sed -i "s|\${POST_LOGOUT_REDIRECT_URI}|${{ secrets.POST_LOGOUT_REDIRECT_URI }}|g" k8s/frontend-deployment.yaml
+          sed -i "s|\${METADATA_URL}|${{ secrets.METADATA_URL }}|g" k8s/frontend-deployment.yaml
+
+      - name: Apply manifests
+        run: kubectl apply -f k8s/frontend-deployment.yaml
+
+      - name: Replace env vars (API)
+        run: |
+          sed -i "s|\${CORS_ORIGINS}|${{ secrets.CORS_ORIGINS }}|g" k8s/api-deployment.yaml
+          sed -i "s|\${CONNECTIONSTRINGS__DEFAULTCONNECTION}|${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}|g" k8s/api-deployment.yaml
+
+      - name: Apply API
+        run: kubectl apply -f k8s/api-deployment.yaml

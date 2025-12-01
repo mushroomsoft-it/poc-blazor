@@ -1,0 +1,42 @@
+name: Build and publish both Docker images
+
+on:
+  push:
+    branches: ["dev"]
+
+env:
+  REGISTRY: ghcr.io
+  FRONTEND_IMAGE: ${{ github.repository }}-frontend
+  API_IMAGE: ${{ github.repository }}-api
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ---------- FRONTEND ----------
+      - name: Build frontend
+        run: docker build -t $REGISTRY/${FRONTEND_IMAGE}:latest ./src/Frontend
+
+      - name: Push frontend
+        run: docker push $REGISTRY/${FRONTEND_IMAGE}:latest
+
+      # ---------- API ----------
+      - name: Build api
+        run: docker build -t $REGISTRY/${API_IMAGE}:latest ./src/ApiService
+
+      - name: Push api
+        run: docker push $REGISTRY/${API_IMAGE}:latest
