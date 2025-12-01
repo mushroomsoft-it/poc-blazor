@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/USER/REPO-frontend:latest
+        image: ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest
         ports:
         - containerPort: 80
         env:
