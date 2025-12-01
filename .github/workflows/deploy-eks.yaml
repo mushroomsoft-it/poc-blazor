@@ -1,7 +1,14 @@
 name: Deploy both services to EKS
 
 on:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      image_frontend:
+        required: true
+        type: string
+      image_api:
+        required: true
+        type: string
 
 permissions:
   id-token: write
@@ -27,6 +34,7 @@ jobs:
 
       - name: Replace environment vars
         run: |
+          sed -i "s|\${IMAGE_FRONTEND}|${{ inputs.image_frontend }}|g" k8s/frontend-deployment.yaml
           sed -i "s|\${AUTHORITY}|${{ secrets.AUTHORITY }}|g" k8s/frontend-deployment.yaml
           sed -i "s|\${CLIENT_ID}|${{ secrets.CLIENT_ID }}|g" k8s/frontend-deployment.yaml
           sed -i "s|\${REDIRECT_URI}|${{ secrets.REDIRECT_URI }}|g" k8s/frontend-deployment.yaml
@@ -38,6 +46,7 @@ jobs:
 
       - name: Replace env vars (API)
         run: |
+          sed -i "s|\${IMAGE_API}|${{ inputs.image_api }}|g" k8s/api-deployment.yaml
           sed -i "s|\${CORS_ORIGINS}|${{ secrets.CORS_ORIGINS }}|g" k8s/api-deployment.yaml
           sed -i "s|\${CONNECTIONSTRINGS__DEFAULTCONNECTION}|${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}|g" k8s/api-deployment.yaml
 
