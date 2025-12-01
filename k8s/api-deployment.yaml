@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: api-service
-        image: ghcr.io/USER/REPO-api:latest
+        image: ghcr.io/mushroomsoft-it/poc-blazor-api:latest
         ports:
         - containerPort: 80
         env:
