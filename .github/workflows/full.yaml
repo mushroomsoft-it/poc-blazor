@@ -25,7 +25,6 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
 
-      # Ejecuta los tests con cobertura
       - name: Run Tests with Coverage
         run: |
           dotnet test \
@@ -33,21 +32,37 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory ./coverage
 
-      # Instalar el ReportGenerator
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
-      # Generar el Reporte HTML
       - name: Generate Coverage Report
         run: |
           reportgenerator \
             -reports:"coverage/**/coverage.cobertura.xml" \
             -targetdir:"coverage-report" \
-            -reporttypes:Html
+            -reporttypes:Html;JsonSummary
 
-      # Guardar el artefacto con el reporte
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage-report
+
+      # Lee el porcentaje desde Summary.json
+      - name: Read Coverage Percentage
+        id: coverage
+        run: |
+          pct=$(jq '.coverage' coverage-report/Summary.json)
+          echo "pct=$pct" >> $GITHUB_OUTPUT
+
+      # Agregar comentario al Pull Request
+      - name: Comment Coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            ## 📊 Cobertura de Código
+            **Total:** `${{ steps.coverage.outputs.pct }}%`
+
+            ✔ HTML del reporte disponible en artifacts.  
+            _Informe generado automáticamente._
