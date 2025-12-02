@@ -47,3 +47,4 @@ jobs:
     with:
       image_frontend: ghcr.io/${{ github.repository }}-frontend:latest
       image_api: ghcr.io/${{ github.repository }}-api:latest
+    secrets: inherit
