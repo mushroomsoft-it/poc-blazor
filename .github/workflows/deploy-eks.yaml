@@ -23,6 +23,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Debug account id
+        run: |
+          echo "ACCOUNT_ID=>>${{ secrets.AWS_ACCOUNT_ID }}<<"
+          echo "ROLE=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployRole"
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
