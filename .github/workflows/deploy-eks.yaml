@@ -10,50 +10,64 @@ on:
         required: true
         type: string
 
+  workflow_dispatch:
+    inputs:
+      image_frontend:
+        description: "Frontend image tag for EKS"
+        required: true
+        default: "ghcr.io/sfalconi2001/poc-blazor-frontend:latest"
+      image_api:
+        description: "API image tag for EKS"
+        required: true
+        default: "ghcr.io/sfalconi2001/poc-blazor-api:latest"
+
 permissions:
-  id-token: write
+  id-token: write # necesario para OIDC -> asumir rol en AWS desde GitHub
   contents: read
   packages: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Debug account id
-        run: |
-          echo "ACCOUNT_ID=>>${{ secrets.AWS_ACCOUNT_ID }}<<"
-          echo "ROLE=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployRole"
-
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (assume role via OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubDeployRole
           aws-region: us-east-1
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name demo-eks
-
-      - name: Replace environment vars
         run: |
-          sed -i "s|\${IMAGE_FRONTEND}|${{ inputs.image_frontend }}|g" k8s/frontend-deployment.yaml
-          sed -i "s|\${AUTHORITY}|${{ secrets.AUTHORITY }}|g" k8s/frontend-deployment.yaml
-          sed -i "s|\${CLIENT_ID}|${{ secrets.CLIENT_ID }}|g" k8s/frontend-deployment.yaml
-          sed -i "s|\${REDIRECT_URI}|${{ secrets.REDIRECT_URI }}|g" k8s/frontend-deployment.yaml
-          sed -i "s|\${POST_LOGOUT_REDIRECT_URI}|${{ secrets.POST_LOGOUT_REDIRECT_URI }}|g" k8s/frontend-deployment.yaml
-          sed -i "s|\${METADATA_URL}|${{ secrets.METADATA_URL }}|g" k8s/frontend-deployment.yaml
+          aws eks update-kubeconfig --name demo-eks --region us-east-1
 
-      - name: Apply manifests
-        run: kubectl apply -f k8s/frontend-deployment.yaml
-
-      - name: Replace env vars (API)
+      - name: Ensure namespace exists
         run: |
-          sed -i "s|\${IMAGE_API}|${{ inputs.image_api }}|g" k8s/api-deployment.yaml
-          sed -i "s|\${CORS_ORIGINS}|${{ secrets.CORS_ORIGINS }}|g" k8s/api-deployment.yaml
-          sed -i "s|\${CONNECTIONSTRINGS__DEFAULTCONNECTION}|${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}|g" k8s/api-deployment.yaml
+          kubectl apply -f k8s/namespace.yaml
 
-      - name: Apply API
-        run: kubectl apply -f k8s/api-deployment.yaml
+      - name: Ensure services & ingress are present (apply once)
+        run: |
+          kubectl apply -f k8s/api-service.yaml
+          kubectl apply -f k8s/frontend-service.yaml
+          kubectl apply -f k8s/ingress.yaml
+
+      - name: (Optional) Create GHCR imagePullSecret if images are private
+        if: ${{ secrets.GHCR_PAT != '' }}
+        run: |
+          kubectl create secret docker-registry ghcr-secret \
+            --docker-server=https://ghcr.io \
+            --docker-username=${{ github.repository_owner }} \
+            --docker-password=${{ secrets.GHCR_PAT }} \
+            -n poc-blazor || true
+
+      - name: Update frontend image (rolling update)
+        run: |
+          kubectl -n poc-blazor set image deployment/frontend frontend=${{ inputs.image_frontend }}
+          kubectl -n poc-blazor rollout status deployment/frontend --timeout=120s
+
+      - name: Update API image (rolling update)
+        run: |
+          kubectl -n poc-blazor set image deployment/api-service api-service=${{ inputs.image_api }}
+          kubectl -n poc-blazor rollout status deployment/api-service --timeout=120s

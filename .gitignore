@@ -76,3 +76,8 @@ certs/
 *.pem
 *.pfx
 
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+

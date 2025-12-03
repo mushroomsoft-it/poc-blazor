@@ -2,20 +2,22 @@ name: Build and publish both Docker images
 
 on:
   push:
-    branches: ["dev"]
+    branches: ["eks-test"]
 
 env:
   REGISTRY: ghcr.io
-  FRONTEND_IMAGE: ${{ github.repository }}-frontend
-  API_IMAGE: ${{ github.repository }}-api
+  # usaremos el owner del repo para formar las imágenes
+  FRONTEND_IMAGE: ${{ github.repository_owner }}/poc-blazor-frontend
+  API_IMAGE: ${{ github.repository_owner }}/poc-blazor-api
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write # necesario para que el workflow que llame al deploy (via OIDC) pueda generar token si lo requiere
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    permissions:
-      packages: write
-      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +47,6 @@ jobs:
     needs: build
     uses: ./.github/workflows/deploy-eks.yaml
     with:
-      image_frontend: ghcr.io/${{ github.repository }}-frontend:latest
-      image_api: ghcr.io/${{ github.repository }}-api:latest
+      image_frontend: ghcr.io/${{ env.FRONTEND_IMAGE }}:latest
+      image_api: ghcr.io/${{ env.API_IMAGE }}:latest
     secrets: inherit
