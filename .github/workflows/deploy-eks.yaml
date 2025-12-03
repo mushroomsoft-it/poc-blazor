@@ -2,6 +2,9 @@ name: Deploy both services to EKS
 
 on:
   workflow_call:
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
     inputs:
       image_frontend:
         required: true
@@ -52,15 +55,6 @@ jobs:
           kubectl apply -f k8s/api-service.yaml
           kubectl apply -f k8s/frontend-service.yaml
           kubectl apply -f k8s/ingress.yaml
-
-      - name: (Optional) Create GHCR imagePullSecret if images are private
-        if: ${{ secrets.GHCR_PAT != '' }}
-        run: |
-          kubectl create secret docker-registry ghcr-secret \
-            --docker-server=https://ghcr.io \
-            --docker-username=${{ github.repository_owner }} \
-            --docker-password=${{ secrets.GHCR_PAT }} \
-            -n poc-blazor || true
 
       - name: Update frontend image (rolling update)
         run: |
