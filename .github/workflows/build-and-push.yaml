@@ -6,18 +6,19 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # usaremos el owner del repo para formar las imágenes
-  FRONTEND_IMAGE: ${{ github.repository_owner }}/poc-blazor-frontend
-  API_IMAGE: ${{ github.repository_owner }}/poc-blazor-api
 
 permissions:
   contents: read
   packages: write
-  id-token: write # necesario para que el workflow que llame al deploy (via OIDC) pueda generar token si lo requiere
+  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    outputs:
+      frontend_image: ${{ steps.set_outputs.outputs.frontend_image }}
+      api_image: ${{ steps.set_outputs.outputs.api_image }}
 
     steps:
       - uses: actions/checkout@v4
@@ -31,22 +32,32 @@ jobs:
 
       # ---------- FRONTEND ----------
       - name: Build frontend
-        run: docker build -t $REGISTRY/${FRONTEND_IMAGE}:latest ./src/Frontend
+        run: |
+          docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-frontend:latest ./src/Frontend
 
       - name: Push frontend
-        run: docker push $REGISTRY/${FRONTEND_IMAGE}:latest
+        run: |
+          docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-frontend:latest
 
       # ---------- API ----------
       - name: Build api
-        run: docker build -t $REGISTRY/${API_IMAGE}:latest ./src/ApiService
+        run: |
+          docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:latest ./src/ApiService
 
       - name: Push api
-        run: docker push $REGISTRY/${API_IMAGE}:latest
+        run: |
+          docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:latest
+
+      - name: Set outputs
+        id: set_outputs
+        run: |
+          echo "frontend_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-frontend:latest" >> $GITHUB_OUTPUT
+          echo "api_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-api:latest" >> $GITHUB_OUTPUT
 
   deploy:
     needs: build
     uses: ./.github/workflows/deploy-eks.yaml
     with:
-      image_frontend: ghcr.io/${{ env.FRONTEND_IMAGE }}:latest
-      image_api: ghcr.io/${{ env.API_IMAGE }}:latest
+      image_frontend: ${{ needs.build.outputs.frontend_image }}
+      image_api: ${{ needs.build.outputs.api_image }}
     secrets: inherit
