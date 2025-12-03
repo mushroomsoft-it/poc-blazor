@@ -35,6 +35,9 @@ jobs:
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
+      - name: Add ReportGenerator tool to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
       - name: Generate Coverage Report
         run: |
           reportgenerator \
@@ -54,14 +57,6 @@ jobs:
           name: coverage-report
           path: coverage-report
 
-      # Lee el porcentaje desde Summary.json
-      - name: Read Coverage Percentage
-        id: coverage
-        run: |
-          pct=$(jq '.coverage' coverage-report/Summary.json)
-          echo "pct=$pct" >> $GITHUB_OUTPUT
-
-      # Agregar comentario al Pull Request
       - name: Comment Coverage on PR
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
@@ -70,5 +65,5 @@ jobs:
             ## 📊 Cobertura de Código
             **Total:** `${{ steps.coverage.outputs.pct }}%`
 
-            ✔ HTML del reporte disponible en artifacts.  
+            ✔ El reporte HTML está disponible en artifacts.  
             _Informe generado automáticamente._
