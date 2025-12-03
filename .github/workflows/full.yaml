@@ -48,9 +48,8 @@ jobs:
       - name: Read Coverage Percentage
         id: coverage
         run: |
-          pct=$(jq -r '.coverage.line // .coverage' coverage-report/Summary.json)
-          pct=$(echo "$pct" | sed 's/[^0-9\.].*//')
-            echo "pct=$pct" >> $GITHUB_OUTPUT
+          pct=$(jq -r '.summary.linecoverage' coverage-report/Summary.json)
+          echo "pct=$pct" >> $GITHUB_OUTPUT
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
