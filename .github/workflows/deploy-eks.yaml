@@ -44,7 +44,7 @@ jobs:
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --name demo-eks-cluster --region us-east-1
+          aws eks update-kubeconfig --name eks-demo-cluster --region us-east-1
 
       - name: Ensure namespace exists
         run: |
