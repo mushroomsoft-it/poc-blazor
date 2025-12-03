@@ -38,9 +38,15 @@ jobs:
       - name: Generate Coverage Report
         run: |
           reportgenerator \
-            -reports:"coverage/**/coverage.cobertura.xml" \
-            -targetdir:"coverage-report" \
-            -reporttypes:Html;JsonSummary
+            "-reports:coverage/**/coverage.cobertura.xml" \
+            "-targetdir:coverage-report" \
+            "-reporttypes:Html;JsonSummary"
+
+      - name: Read Coverage Percentage
+        id: coverage
+        run: |
+          pct=$(jq '.coverage' coverage-report/Summary.json)
+          echo "pct=$pct" >> $GITHUB_OUTPUT
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
