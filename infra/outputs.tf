@@ -18,6 +18,15 @@ output "alb_controller_role_arn" {
   value       = aws_iam_role.alb_controller.arn
 }
 
+output "alb_irsa_role_arn" {
+  value = aws_iam_role.alb_controller.arn
+}
+
+output "github_deploy_role_arn" {
+  description = "ARN of the GitHub deploy role"
+  value       = aws_iam_role.github_deploy_role.arn
+}
+
 output "vpc_id" {
   description = "VPC used by the EKS cluster"
   value       = aws_vpc.eks_vpc.id
@@ -28,7 +37,11 @@ output "region" {
   value       = var.aws_region
 }
 
-output "github_deploy_role_arn" {
-  value = aws_iam_role.github_deploy_role.arn
+output "terraform_role_arn" {
+  value = aws_iam_role.terraform_role.arn
+}
+
+output "current_account_id" {
+  value = data.aws_caller_identity.current.account_id
 }
 

@@ -3,15 +3,11 @@ resource "aws_iam_role" "eks_cluster_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "eks.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "eks.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
   })
 }
 
@@ -36,6 +32,13 @@ resource "aws_eks_cluster" "demo_cluster" {
     endpoint_private_access = false
   }
 
+  access_config {
+    authentication_mode                         = "API"
+    bootstrap_cluster_creator_admin_permissions = true
+  }
+
+  enabled_cluster_log_types = ["api"]
+
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_AmazonEKSClusterPolicy,
     aws_iam_role_policy_attachment.eks_cluster_AmazonEKSServicePolicy
@@ -47,15 +50,11 @@ resource "aws_iam_role" "eks_node_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
   })
 }
 
@@ -97,4 +96,44 @@ resource "aws_eks_node_group" "demo_nodes" {
     aws_iam_role_policy_attachment.eks_node_AmazonEKSCNIPolicy,
     aws_iam_role_policy_attachment.eks_node_AmazonEC2ContainerRegistryReadOnly
   ]
+}
+
+resource "aws_eks_access_entry" "github_entry" {
+  depends_on = [aws_eks_cluster.demo_cluster, aws_iam_role.terraform_role]
+
+  cluster_name  = aws_eks_cluster.demo_cluster.name
+  principal_arn = aws_iam_role.github_deploy_role.arn
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "github_admin" {
+  depends_on = [aws_eks_access_entry.github_entry]
+
+  cluster_name  = aws_eks_cluster.demo_cluster.name
+  principal_arn = aws_iam_role.github_deploy_role.arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+}
+
+resource "aws_eks_access_entry" "terraform_access" {
+  depends_on = [aws_eks_cluster.demo_cluster, aws_iam_role.terraform_role]
+
+  cluster_name  = aws_eks_cluster.demo_cluster.name
+  principal_arn = aws_iam_role.terraform_role.arn
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "terraform_admin" {
+  depends_on = [aws_eks_access_entry.terraform_access]
+
+  cluster_name  = aws_eks_cluster.demo_cluster.name
+  principal_arn = aws_iam_role.terraform_role.arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
 }

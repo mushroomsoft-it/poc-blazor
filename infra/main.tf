@@ -1,12 +1,20 @@
 terraform {
+  required_version = ">= 1.5.0"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = ">= 6.24.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.30.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.10.1"
     }
   }
-
-  required_version = ">= 1.5.0"
 }
 
 provider "aws" {
@@ -21,21 +29,37 @@ data "aws_eks_cluster_auth" "eks" {
   name = aws_eks_cluster.demo_cluster.name
 }
 
-data "tls_certificate" "eks_oidc" {
-  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
+data "aws_eks_cluster" "cluster_waiter" {
+  name = aws_eks_cluster.demo_cluster.name
+
+  depends_on = [
+    aws_eks_access_policy_association.terraform_admin
+  ]
+}
+
+resource "null_resource" "wait_for_access" {
+  depends_on = [
+    aws_eks_access_policy_association.terraform_admin
+  ]
+}
+
+resource "time_sleep" "wait_access" {
+  depends_on      = [aws_eks_access_policy_association.terraform_admin]
+  create_duration = "30s"
+}
+
+provider "kubernetes" {
+  alias = "eks"
+
+  host                   = data.aws_eks_cluster.cluster_waiter.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster_waiter.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.eks.token
 }
 
 provider "helm" {
   kubernetes = {
-    host                   = data.aws_eks_cluster.eks.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+    host                   = data.aws_eks_cluster.cluster_waiter.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster_waiter.certificate_authority[0].data)
     token                  = data.aws_eks_cluster_auth.eks.token
   }
 }
-
-provider "kubernetes" {
-  host                   = data.aws_eks_cluster.eks.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.eks.token
-}
-
