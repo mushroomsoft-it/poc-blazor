@@ -18,12 +18,11 @@ on:
       image_frontend:
         description: "Frontend image tag for EKS"
         required: true
-        default: "ghcr.io/sfalconi2001/poc-blazor-frontend:latest"
+        default: "ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest"
       image_api:
         description: "API image tag for EKS"
         required: true
-        default: "ghcr.io/sfalconi2001/poc-blazor-api:latest"
-
+        default: "ghcr.io/mushroomsoft-it/poc-blazor-api:latest"
 permissions:
   id-token: write # necesario para OIDC -> asumir rol en AWS desde GitHub
   contents: read
