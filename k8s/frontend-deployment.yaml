@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ${IMAGE_FRONTEND}
+        image: ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
