@@ -47,7 +47,7 @@ jobs:
 
   deploy:
     needs: build
-    uses: ./github/workflows/deploy-api-eks.yaml
+    uses: ./.github/workflows/deploy-api-eks.yaml
     with:
       image_api: ${{ needs.build.outputs.api_image }}
     secrets: inherit

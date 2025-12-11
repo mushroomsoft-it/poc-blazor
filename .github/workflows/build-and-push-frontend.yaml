@@ -4,8 +4,8 @@ on:
   push:
     branches: ["eks-test"]
     paths:
-      - 'src/Frontend/**'
-      - 'k8s/frontend-*.yaml'
+      - "src/Frontend/**"
+      - "k8s/frontend-*.yaml"
 
 env:
   REGISTRY: ghcr.io
@@ -49,7 +49,7 @@ jobs:
 
   deploy:
     needs: build
-    uses: ./.github/workflows/deploy-eks.yaml
+    uses: ./.github/workflows/deploy-frontend-eks.yaml
     with:
       image_frontend: ${{ needs.build.outputs.frontend_image }}
     secrets: inherit
