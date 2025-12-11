@@ -18,7 +18,7 @@ spec:
           image: ghcr.io/mushroomsoft-it/poc-blazor-api:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           env:
             - name: CorsOrigins
               value: "*"
