@@ -14,26 +14,27 @@ spec:
         app: frontend
     spec:
       containers:
-      - name: frontend
-        image: ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
-        env:
-        - name: BaseUrl
-          value: "http://api-service.poc-blazor.svc.cluster.local:80"
+        - name: frontend
+          # Imagen base (será reemplazada dinámicamente con kubectl set image)
+          image: ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: BaseUrl
+              value: "http://api-service.poc-blazor.svc.cluster.local:80"
 
-        - name: Authority
-          value: "${AUTHORITY}"
+            - name: Authority
+              value: "${AUTHORITY}"
 
-        - name: ClientId
-          value: "${CLIENT_ID}"
+            - name: ClientId
+              value: "${CLIENT_ID}"
 
-        - name: RedirectUri
-          value: "${REDIRECT_URI}"
+            - name: RedirectUri
+              value: "${REDIRECT_URI}"
 
-        - name: PostLogoutRedirectUri
-          value: "${POST_LOGOUT_REDIRECT_URI}"
+            - name: PostLogoutRedirectUri
+              value: "${POST_LOGOUT_REDIRECT_URI}"
 
-        - name: MetadataUrl
-          value: "${METADATA_URL}"
+            - name: MetadataUrl
+              value: "${METADATA_URL}"

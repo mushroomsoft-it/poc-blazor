@@ -14,13 +14,13 @@ spec:
         app: api-service
     spec:
       containers:
-      - name: api-service
-        image: ghcr.io/mushroomsoft-it/poc-blazor-api:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
-        env:
-          - name: CorsOrigins
-            value: "*"
-          - name: ConnectionStrings__DefaultConnection
-            value: "Host=postgres.poc-blazor.svc.cluster.local;Port=5432;Database=pocblazordb;Username=postgres;Password=postgres123"
+        - name: api-service
+          image: ghcr.io/mushroomsoft-it/poc-blazor-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: CorsOrigins
+              value: "*"
+            - name: ConnectionStrings__DefaultConnection
+              value: "Host=postgres.poc-blazor.svc.cluster.local;Port=5432;Database=pocblazordb;Username=postgres;Password=postgres123"

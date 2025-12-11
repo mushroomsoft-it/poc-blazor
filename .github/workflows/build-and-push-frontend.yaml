@@ -3,6 +3,9 @@ name: Build and publish both Docker images
 on:
   push:
     branches: ["eks-test"]
+    paths:
+      - 'src/Frontend/**'
+      - 'k8s/frontend-*.yaml'
 
 env:
   REGISTRY: ghcr.io
@@ -39,25 +42,14 @@ jobs:
         run: |
           docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-frontend:latest
 
-      # ---------- API ----------
-      - name: Build api
-        run: |
-          docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:latest ./src/ApiService
-
-      - name: Push api
-        run: |
-          docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:latest
-
       - name: Set outputs
         id: set_outputs
         run: |
           echo "frontend_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-frontend:latest" >> $GITHUB_OUTPUT
-          echo "api_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-api:latest" >> $GITHUB_OUTPUT
 
   deploy:
     needs: build
     uses: ./.github/workflows/deploy-eks.yaml
     with:
       image_frontend: ${{ needs.build.outputs.frontend_image }}
-      image_api: ${{ needs.build.outputs.api_image }}
     secrets: inherit

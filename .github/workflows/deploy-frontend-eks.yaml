@@ -1,4 +1,4 @@
-name: Deploy both services to EKS
+name: Deploy Frontend to EKS
 
 on:
   workflow_call:
@@ -9,9 +9,6 @@ on:
       image_frontend:
         required: true
         type: string
-      image_api:
-        required: true
-        type: string
 
   workflow_dispatch:
     inputs:
@@ -19,53 +16,45 @@ on:
         description: "Frontend image tag for EKS"
         required: true
         default: "ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest"
-      image_api:
-        description: "API image tag for EKS"
-        required: true
-        default: "ghcr.io/mushroomsoft-it/poc-blazor-api:latest"
+
 permissions:
-  id-token: write # necesario para OIDC -> asumir rol en AWS desde GitHub
+  id-token: write
   contents: read
   packages: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug
+      - name: Debug info
         run: |
-          echo "Repo: $GITHUB_REPOSITORY"
+          echo "Repository: $GITHUB_REPOSITORY"
           echo "Ref: $GITHUB_REF"
+          echo "Frontend Image: ${{ inputs.image_frontend }}"
 
-      - name: Configure AWS credentials (assume role via OIDC)
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHub-Actions-Deploy-Role
           aws-region: us-east-1
 
       - name: Update kubeconfig
-        run: |
-          aws eks update-kubeconfig --name eks-demo-cluster --region us-east-1
+        run: aws eks update-kubeconfig --name eks-demo-cluster --region us-east-1
 
       - name: Ensure namespace exists
-        run: |
-          kubectl apply -f k8s/namespace.yaml
+        run: kubectl apply -f k8s/namespace.yaml
 
-      - name: Ensure services & ingress are present (apply once)
+      - name: Ensure frontend service & ingress exist
         run: |
-          kubectl apply -f k8s/api-service.yaml
           kubectl apply -f k8s/frontend-service.yaml
           kubectl apply -f k8s/ingress.yaml
 
       - name: Update frontend image (rolling update)
         run: |
+          echo "Updating frontend image to: ${{ inputs.image_frontend }}"
           kubectl -n poc-blazor set image deployment/frontend frontend=${{ inputs.image_frontend }}
           kubectl -n poc-blazor rollout status deployment/frontend --timeout=120s
-
-      - name: Update API image (rolling update)
-        run: |
-          kubectl -n poc-blazor set image deployment/api-service api-service=${{ inputs.image_api }}
-          kubectl -n poc-blazor rollout status deployment/api-service --timeout=120s

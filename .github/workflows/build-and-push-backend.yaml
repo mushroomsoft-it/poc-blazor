@@ -1,0 +1,53 @@
+name: Build and publish both Docker images
+
+on:
+  push:
+    branches: ["eks-test"]
+    paths:
+      - "src/ApiService/**"
+      - "k8s/api-*.yaml"
+
+env:
+  REGISTRY: ghcr.io
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      api_image: ${{ steps.set_outputs.outputs.api_image }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build api
+        run: |
+          docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:latest ./src/ApiService
+
+      - name: Push api
+        run: |
+          docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:latest
+
+      - name: Set outputs
+        id: set_outputs
+        run: |
+          echo "api_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-api:latest" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: build
+    uses: ./github/workflows/deploy-api-eks.yaml
+    with:
+      image_api: ${{ needs.build.outputs.api_image }}
+    secrets: inherit
