@@ -34,17 +34,15 @@ jobs:
 
       - name: Build api
         run: |
-          docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:latest ./src/ApiService
+          docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:${{ github.run_number }} ./src/ApiService
 
       - name: Push api
         run: |
-          docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:latest
-
+          docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-api:${{ github.run_number }}
       - name: Set outputs
         id: set_outputs
         run: |
-          echo "api_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-api:latest" >> $GITHUB_OUTPUT
-
+          echo "api_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-api:${{ github.run_number }}" >> $GITHUB_OUTPUT
   deploy:
     needs: build
     uses: ./.github/workflows/deploy-api-eks.yaml

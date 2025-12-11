@@ -21,7 +21,6 @@ jobs:
 
     outputs:
       frontend_image: ${{ steps.set_outputs.outputs.frontend_image }}
-      api_image: ${{ steps.set_outputs.outputs.api_image }}
 
     steps:
       - uses: actions/checkout@v4
@@ -36,16 +35,15 @@ jobs:
       # ---------- FRONTEND ----------
       - name: Build frontend
         run: |
-          docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-frontend:latest ./src/Frontend
+          docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-frontend:${{ github.run_number }} ./src/Frontend
 
       - name: Push frontend
         run: |
-          docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-frontend:latest
-
+          docker push $REGISTRY/${{ github.repository_owner }}/poc-blazor-frontend:${{ github.run_number }}
       - name: Set outputs
         id: set_outputs
         run: |
-          echo "frontend_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-frontend:latest" >> $GITHUB_OUTPUT
+          echo "frontend_image=ghcr.io/${{ github.repository_owner }}/poc-blazor-frontend:${{ github.run_number }}" >> $GITHUB_OUTPUT
 
   deploy:
     needs: build
