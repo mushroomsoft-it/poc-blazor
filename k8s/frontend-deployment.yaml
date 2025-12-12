@@ -15,7 +15,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          # Imagen base (será reemplazada dinámicamente con kubectl set image)
           image: ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest
           imagePullPolicy: Always
           ports:
