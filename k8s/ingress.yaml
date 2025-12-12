@@ -8,14 +8,21 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
-    alb.ingress.kubernetes.io/healthcheck-path: /
-    alb.ingress.kubernetes.io/actions.api-rewrite: >
-      {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"api-service","servicePort":"8080"}]}, "targetGroupStickinessConfig": {"enabled": false}, "rewriteConfig": {"pathPrefix": "/"}}
+    alb.ingress.kubernetes.io/healthcheck-path: /weatherforecast
 spec:
-  ingressClassName: alb
   rules:
     - http:
         paths:
+          # Backend en /weatherforecast
+          - path: /weatherforecast
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 8080
+
+          # Frontend en /
           - path: /
             pathType: Prefix
             backend:
@@ -23,11 +30,3 @@ spec:
                 name: frontend-service
                 port:
                   number: 80
-
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: api-rewrite
-                port:
-                  name: use-annotation
