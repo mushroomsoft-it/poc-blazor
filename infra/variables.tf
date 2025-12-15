@@ -7,15 +7,33 @@ variable "aws_region" {
 variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
-  default     = "eks-demo-cluster"
 }
 
-variable "terraform_user_arn" {
-  description = "ARN of the user or role that Terraform will use to manage the EKS cluster"
-  type        = string
-}
-variable "github_deploy_role_arn" {
-  description = "ARN of the GitHub Actions deploy role"
+variable "vpc_cidr" {
+  description = "CIDR block for EKS VPC"
   type        = string
 }
 
+variable "public_subnets" {
+  description = "Public subnets configuration"
+  type = list(object({
+    cidr = string
+    az   = string
+    name = string
+  }))
+}
+
+variable "project_name" {
+  description = "Project name for tagging"
+  type        = string
+}
+
+variable "kubernetes_version" {
+  type    = string
+  default = "1.29"
+}
+
+variable "environment" {
+  description = "Environment name for tagging"
+  type        = string
+}

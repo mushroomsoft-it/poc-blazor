@@ -21,23 +21,9 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "aws_eks_cluster" "eks" {
-  name = aws_eks_cluster.demo_cluster.name
-}
-
-data "aws_eks_cluster_auth" "eks" {
-  name = aws_eks_cluster.demo_cluster.name
-}
-
 data "aws_eks_cluster" "cluster_waiter" {
-  name = aws_eks_cluster.demo_cluster.name
+  name = aws_eks_cluster.eks_cluster.name
 
-  depends_on = [
-    aws_eks_access_policy_association.terraform_admin
-  ]
-}
-
-resource "null_resource" "wait_for_access" {
   depends_on = [
     aws_eks_access_policy_association.terraform_admin
   ]
@@ -51,15 +37,43 @@ resource "time_sleep" "wait_access" {
 provider "kubernetes" {
   alias = "eks"
 
-  host                   = data.aws_eks_cluster.cluster_waiter.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster_waiter.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.eks.token
+  host = aws_eks_cluster.eks_cluster.endpoint
+  cluster_ca_certificate = base64decode(
+    aws_eks_cluster.eks_cluster.certificate_authority[0].data
+  )
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args = [
+      "eks",
+      "get-token",
+      "--cluster-name",
+      aws_eks_cluster.eks_cluster.name,
+      "--role-arn",
+      aws_iam_role.terraform_role.arn
+    ]
+  }
 }
 
 provider "helm" {
   kubernetes = {
-    host                   = data.aws_eks_cluster.cluster_waiter.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster_waiter.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.eks.token
+    host = aws_eks_cluster.eks_cluster.endpoint
+    cluster_ca_certificate = base64decode(
+      aws_eks_cluster.eks_cluster.certificate_authority[0].data
+    )
+
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args = [
+        "eks",
+        "get-token",
+        "--cluster-name",
+        aws_eks_cluster.eks_cluster.name,
+        "--role-arn",
+        aws_iam_role.terraform_role.arn
+      ]
+    }
   }
 }
