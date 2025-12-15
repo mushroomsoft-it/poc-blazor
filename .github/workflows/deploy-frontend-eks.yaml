@@ -43,7 +43,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name eks-demo-cluster --region us-east-1
+        run: aws eks update-kubeconfig --name poc-blazor-eks-cluster --region us-east-1
 
       - name: Ensure namespace exists
         run: kubectl apply -f k8s/namespace.yaml

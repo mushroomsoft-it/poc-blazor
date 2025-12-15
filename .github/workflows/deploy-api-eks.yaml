@@ -1,52 +1,52 @@
 name: Deploy API to EKS
 
 on:
-    workflow_call:
-        secrets:
-            AWS_ACCOUNT_ID:
-                required: true
-        inputs:
-            image_api:
-                required: true
-                type: string
+  workflow_call:
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
+    inputs:
+      image_api:
+        required: true
+        type: string
 
-    workflow_dispatch:
-        inputs:
-            image_api:
-                description: "API image tag for EKS"
-                required: true
-                default: "ghcr.io/mushroomsoft-it/poc-blazor-api:latest"
+  workflow_dispatch:
+    inputs:
+      image_api:
+        description: "API image tag for EKS"
+        required: true
+        default: "ghcr.io/mushroomsoft-it/poc-blazor-api:latest"
 
 permissions:
-    id-token: write
-    contents: read
-    packages: read
+  id-token: write
+  contents: read
+  packages: read
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Configure AWS credentials (OIDC)
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHub-Actions-Deploy-Role
-                  aws-region: us-east-1
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHub-Actions-Deploy-Role
+          aws-region: us-east-1
 
-            - name: Update kubeconfig
-              run: aws eks update-kubeconfig --name eks-demo-cluster --region us-east-1
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name poc-blazor-eks-cluster --region us-east-1
 
-            - name: Ensure namespace exists
-              run: kubectl apply -f k8s/namespace.yaml
+      - name: Ensure namespace exists
+        run: kubectl apply -f k8s/namespace.yaml
 
-            - name: Ensure API service exists
-              run: kubectl apply -f k8s/api-service.yaml
+      - name: Ensure API service exists
+        run: kubectl apply -f k8s/api-service.yaml
 
-            - name: Update API image (rolling update)
-              run: |
-                  echo "Updating API image to: ${{ inputs.image_api }}"
-                  kubectl -n poc-blazor set image deployment/api-service api-service=${{ inputs.image_api }}
-                  kubectl -n poc-blazor rollout status deployment/api-service --timeout=120s
+      - name: Update API image (rolling update)
+        run: |
+          echo "Updating API image to: ${{ inputs.image_api }}"
+          kubectl -n poc-blazor set image deployment/api-service api-service=${{ inputs.image_api }}
+          kubectl -n poc-blazor rollout status deployment/api-service --timeout=120s
