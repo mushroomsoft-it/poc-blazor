@@ -140,11 +140,6 @@ resource "aws_iam_policy" "terraform_eks_policy" {
       {
         Effect = "Allow"
         Action = [
-          "iam:CreateRole",
-          "iam:DeleteRole",
-          "iam:GetRole",
-          "iam:ListRoles",
-          "iam:PassRole",
           "iam:AttachRolePolicy",
           "iam:DetachRolePolicy",
           "iam:CreatePolicy",
@@ -162,6 +157,11 @@ resource "aws_iam_policy" "terraform_eks_policy" {
           "iam:UntagRole"
         ]
         Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["iam:PassRole"]
+        Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_name}-eks-*"
       },
       {
         Effect = "Allow"
@@ -259,7 +259,6 @@ resource "kubernetes_service_account_v1" "alb_controller_sa" {
   provider = kubernetes.eks
 
   depends_on = [
-    time_sleep.wait_access,
     aws_iam_role.alb_controller,
     aws_eks_access_entry.terraform_access,
     aws_eks_access_policy_association.terraform_admin

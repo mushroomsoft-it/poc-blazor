@@ -21,11 +21,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "time_sleep" "wait_access" {
-  depends_on      = [aws_eks_access_policy_association.terraform_admin]
-  create_duration = "30s"
-}
-
 provider "kubernetes" {
   alias = "eks"
 
