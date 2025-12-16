@@ -84,7 +84,10 @@ resource "aws_iam_policy" "github_deploy_policy" {
         Action = [
           "iam:GetRole"
         ]
-        Resource = "*"
+        Resource = [
+          aws_iam_role.eks_cluster_role.arn,
+          aws_iam_role.eks_node_role.arn
+        ]
       }
     ]
   })
