@@ -83,8 +83,9 @@ certs/
 *.tfstate
 *.tfstate.backup
 
-+# Terraform state files
-+*.tfstate
-+*.tfstate.*
-+*.backup
-+.terraform/
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.backup
+.terraform/
+.terraform.lock.hcl
