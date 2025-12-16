@@ -1,4 +1,4 @@
-name: Build and publish both Docker images
+name: Build and publish Api Docker image
 
 on:
   push:

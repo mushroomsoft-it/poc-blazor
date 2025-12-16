@@ -1,4 +1,4 @@
-name: Build and publish both Docker images
+name: Build and publish Frontend Docker image
 
 on:
   push:
@@ -32,7 +32,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # ---------- FRONTEND ----------
       - name: Build frontend
         run: |
           docker build -t $REGISTRY/${{ github.repository_owner }}/poc-blazor-frontend:${{ github.run_number }} ./src/Frontend

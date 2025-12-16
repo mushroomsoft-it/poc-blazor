@@ -55,10 +55,7 @@ resource "aws_iam_policy" "github_deploy_policy" {
         Action = [
           "sts:GetCallerIdentity"
         ]
-        Resource = [
-          aws_eks_cluster.eks_cluster.arn,
-          "${aws_eks_cluster.eks_cluster.arn}/*"
-        ]
+        Resource = "*"
       },
       {
         Effect = "Allow"

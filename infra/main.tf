@@ -21,14 +21,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "aws_eks_cluster" "cluster_waiter" {
-  name = aws_eks_cluster.eks_cluster.name
-
-  depends_on = [
-    aws_eks_access_policy_association.terraform_admin
-  ]
-}
-
 resource "time_sleep" "wait_access" {
   depends_on      = [aws_eks_access_policy_association.terraform_admin]
   create_duration = "30s"
