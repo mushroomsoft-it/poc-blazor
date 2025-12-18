@@ -1,5 +1,6 @@
 using ApiService.Data;
 using ApiService.Dtos;
+using ApiService.Metrics;
 using ApiService.Models;
 using ApiService.Respositories;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +26,7 @@ namespace ApiService.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            _log.LogInformation("Obteniendo la lista de estudiantes");
             var list = await _repo.GetAllAsync();
             return Ok(list);
         }
@@ -40,9 +42,12 @@ namespace ApiService.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] EstudianteCreateDto dto)
         {
+            _log.LogInformation("Creando un nuevo estudiante");
+            AppMetrics.EstudiantesCreados.Add(1);
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var e = new Estudiante { Nombre = dto.Nombre, Direccion = dto.Direccion };
             var created = await _repo.AddAsync(e);
+            AppMetrics.EstudianteDuration.Record(50.0); // Simulated processing time
             return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
         }
 
@@ -63,6 +68,16 @@ namespace ApiService.Controllers
             var ok = await _repo.DeleteAsync(id);
             if (!ok) return NotFound();
             return NoContent();
+        }
+
+        [HttpGet("error")]
+        public IActionResult ForceError()
+        {
+            AppMetrics.EstudianteErrors.Add(1);
+
+            _log.LogError("❌ Error simulado");
+
+            throw new InvalidOperationException("Error simulado");
         }
     }
 }
