@@ -1,0 +1,13 @@
+loki:
+  auth_enabled: false
+
+  storage:
+    type: s3
+    s3:
+      bucketnames: <BUCKET_NAME>
+      region: us-east-1
+      s3forcepathstyle: true
+
+extraEnvFrom:
+  - secretRef:
+      name: aws-credentials
