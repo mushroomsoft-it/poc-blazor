@@ -76,3 +76,23 @@ certs/
 *.pem
 *.pfx
 
+###################################
+###        OTROS ARCHIVOS      ###
+###################################
+test/*/TestResults/
+.vs/
+.idea/
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.backup
+.terraform/
+.terraform.lock.hcl
+

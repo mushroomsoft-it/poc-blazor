@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: poc-blazor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: BaseUrl
+              value: "http://api-service.poc-blazor.svc.cluster.local:80"
+
+            - name: Authority
+              value: "${AUTHORITY}"
+
+            - name: ClientId
+              value: "${CLIENT_ID}"
+
+            - name: RedirectUri
+              value: "${REDIRECT_URI}"
+
+            - name: PostLogoutRedirectUri
+              value: "${POST_LOGOUT_REDIRECT_URI}"
+
+            - name: MetadataUrl
+              value: "${METADATA_URL}"

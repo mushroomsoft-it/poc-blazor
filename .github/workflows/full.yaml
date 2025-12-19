@@ -1,7 +1,7 @@
 name: Build Full Solution
 
 on:
-  push:
+  pull_request:
     branches: ["main"]
 
 jobs:
@@ -19,19 +19,47 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release
+        run: dotnet build --no-restore
 
-      - name: Run tests
-        run: dotnet test --configuration Release --no-build
+      - name: Run Tests with Coverage
+        run: |
+          dotnet test \
+            --no-build \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage
 
-      - name: Publish API
-        run: dotnet publish src/ApiService/ApiService.csproj -c Release -o publish/api
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
-      - name: Publish Blazor
-        run: dotnet publish src/Frontend/Frontend.csproj -c Release -o publish/blazor
+      - name: Add ReportGenerator tool to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: Upload all
+      - name: Generate Coverage Report
+        run: |
+          reportgenerator \
+            "-reports:coverage/**/coverage.cobertura.xml" \
+            "-targetdir:coverage-report" \
+            "-reporttypes:Html;JsonSummary"
+
+      - name: Read Coverage Percentage
+        id: coverage
+        run: |
+          pct=$(jq -r '.summary.linecoverage' coverage-report/Summary.json)
+          echo "pct=$pct" >> $GITHUB_OUTPUT
+
+      - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
-          name: full-build
-          path: publish
+          name: coverage-report
+          path: coverage-report
+
+      - name: Comment Coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            ## 📊 Cobertura de Código
+            **Total:** `${{ steps.coverage.outputs.pct }}%`
+
+            ✔ El reporte HTML está disponible en artifacts.  
+            _Informe generado automáticamente._
