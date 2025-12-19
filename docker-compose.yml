@@ -22,6 +22,8 @@ services:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=mydb;Username=postgres;Password=postgres
     depends_on:
       - postgres
+      - otel-collector1
+
   app:
     image: efaby10/my-blazor-app:latest
     build:
@@ -33,12 +35,77 @@ services:
     environment:
       - BaseUrl=http://localhost:8080
       - Authority=https://app-name.auth.region.amazoncognito.com
-      - ClientId=xxxxxxxxx
+      - ClientId=xxxxxxxxxxx
       - RedirectUri=https://localhost/authentication/login-callback
       - PostLogoutRedirectUri=https://localhost/
       - MetadataUrl=https://domain-aws/pool_id/.well-known/openid-configuration
     depends_on:
       - api
+
+  otel-collector1:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector1
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./logs:/var/log/otel
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+    depends_on:
+      - tempo1
+      - loki1
+      - prometheus1
+
+  promtail1:
+    image: grafana/promtail:latest
+    container_name: promtail1
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+      - ./logs:/var/log/otel
+    command: -config.file=/etc/promtail/config.yaml
+    depends_on:
+      - loki1
+
+  loki1:
+    image: grafana/loki:2.9.0
+    container_name: loki1
+    command: -config.file=/etc/loki/config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/config.yaml
+    ports:
+      - "3100:3100"
+
+  tempo1:
+    image: grafana/tempo:latest
+    container_name: tempo1
+    command: -config.file=/etc/tempo/tempo.yaml
+    volumes:
+      - ./tempo.yaml:/etc/tempo/tempo.yaml
+    ports:
+      - "3200:3200"
+
+  prometheus1:
+    image: prom/prometheus:latest
+    container_name: prometheus1
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+
+  grafana1:
+    image: grafana/grafana:latest
+    container_name: grafana1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - tempo1
+      - loki1
+      - prometheus1
+
 
 volumes:
   pg_data:

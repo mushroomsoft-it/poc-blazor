@@ -2,7 +2,13 @@ using ApiService.Data;
 using ApiService.Respositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Instrumentation.Runtime;
+using System.Diagnostics.Metrics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +60,49 @@ builder.Services.AddAuthentication("Bearer")
 
 builder.Services.AddAuthorization();
 
+// ---------- LOGS ----------
+
+builder.Logging.ClearProviders();
+
+builder.Logging.AddOpenTelemetry(logging =>
+{
+    logging.IncludeFormattedMessage = true;
+    logging.IncludeScopes = true;
+
+    logging.AddOtlpExporter(o =>
+    {
+        o.Endpoint = new Uri("http://otel-collector1:4317");
+    });
+});
+
+// OpenTelemetry principal
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource =>
+        resource.AddService(serviceName: "my-api", serviceVersion: "1.0.0"))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri("http://otel-collector1:4317");
+            });
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddMeter("MyApp.Metrics")
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri("http://otel-collector1:4317");
+                o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+            });
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -75,7 +124,21 @@ app.UseAuthorization();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate(); // Ejecuta TODAS las migraciones pendientes
+
+    var retry = 10;
+    while (retry-- > 0)
+    {
+        try
+        {
+            db.Database.Migrate();
+            break;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("⏳ Esperando a PostgreSQL...");
+            Thread.Sleep(3000);
+        }
+    }
 }
 
 app.MapControllers();
