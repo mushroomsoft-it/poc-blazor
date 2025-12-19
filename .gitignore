@@ -76,6 +76,12 @@ certs/
 *.pem
 *.pfx
 
+###################################
+###        OTROS ARCHIVOS      ###
+###################################
+test/*/TestResults/
+.vs/
+.idea/
 *.tfstate
 *.tfstate.backup
 .terraform/
@@ -89,3 +95,4 @@ certs/
 *.backup
 .terraform/
 .terraform.lock.hcl
+
