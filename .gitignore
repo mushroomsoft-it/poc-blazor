@@ -76,3 +76,16 @@ certs/
 *.pem
 *.pfx
 
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.backup
+.terraform/
+.terraform.lock.hcl

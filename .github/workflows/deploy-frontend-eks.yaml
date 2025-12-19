@@ -1,0 +1,61 @@
+name: Deploy Frontend to EKS
+
+on:
+  workflow_call:
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
+    inputs:
+      image_frontend:
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      image_frontend:
+        description: "Frontend image tag for EKS"
+        required: true
+        default: "ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest"
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Debug info
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Ref: $GITHUB_REF"
+          echo "Frontend Image: ${{ inputs.image_frontend }}"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHub-Actions-Deploy-Role
+          aws-region: us-east-1
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name poc-blazor-eks-cluster --region us-east-1
+
+      - name: Ensure namespace exists
+        run: kubectl apply -f k8s/namespace.yaml
+
+      - name: Ensure frontend service & ingress exist
+        run: |
+          kubectl apply -f k8s/frontend-deployment.yaml
+          kubectl apply -f k8s/frontend-service.yaml
+          kubectl apply -f k8s/ingress.yaml
+
+      - name: Update frontend image (rolling update)
+        run: |
+          echo "Updating frontend image to: ${{ inputs.image_frontend }}"
+          kubectl -n poc-blazor set image deployment/frontend frontend=${{ inputs.image_frontend }}
+          kubectl -n poc-blazor rollout status deployment/frontend --timeout=120s
