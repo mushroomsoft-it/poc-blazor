@@ -37,3 +37,18 @@ variable "environment" {
   description = "Environment name for tagging"
   type        = string
 }
+
+variable "email" {
+  type        = string
+  description = "Email address for Let's Encrypt notifications"
+}
+
+variable "godaddy_api_key" {
+  type        = string
+  description = "GoDaddy API key for DNS management"
+}
+
+variable "godaddy_api_secret" {
+  type        = string
+  description = "GoDaddy API secret for DNS management"
+}

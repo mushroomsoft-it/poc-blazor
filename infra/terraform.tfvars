@@ -18,3 +18,9 @@ public_subnets = [
 environment = "development"
 
 cluster_name = "poc-blazor-eks-cluster"
+
+email = "sfalconi@mushroomsoft-it.com"
+
+godaddy_api_key = "gGpXP4aPKw5c_MJaKx7MbSxsSZgg4pfyrUB"
+
+godaddy_api_secret = "BZCJ8vFyYnJRTHinyjsxG4"

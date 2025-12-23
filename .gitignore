@@ -96,3 +96,6 @@ test/*/TestResults/
 .terraform/
 .terraform.lock.hcl
 
+.tfvars
+*.tfvars.json
+
