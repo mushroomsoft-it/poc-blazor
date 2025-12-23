@@ -2,10 +2,11 @@ name: Build and publish Frontend Docker image
 
 on:
   push:
-    branches: ["eks-test"]
+    branches: ["enable-https"]
     paths:
       - "src/Frontend/**"
       - "k8s/frontend-*.yaml"
+      - ".github/workflows/build-and-push-frontend.yaml"
 
 env:
   REGISTRY: ghcr.io
