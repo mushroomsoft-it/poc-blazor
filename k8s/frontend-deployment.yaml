@@ -41,3 +41,8 @@ spec:
         - name: tls-certs
           secret:
             secretName: blazor-tls
+            items:
+              - key: tls.crt
+                path: blazor.crt
+              - key: tls.key
+                path: blazor.key
