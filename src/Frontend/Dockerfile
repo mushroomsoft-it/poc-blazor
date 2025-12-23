@@ -19,10 +19,6 @@ RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Copiar certificados
-COPY certs/blazor.crt /etc/nginx/certs/blazor.crt
-COPY certs/blazor.key /etc/nginx/certs/blazor.key
-
 # Copiar el sitio Blazor
 COPY --from=build /build/wwwroot /usr/share/nginx/html
 

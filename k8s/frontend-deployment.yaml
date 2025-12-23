@@ -19,21 +19,25 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 80
+            - containerPort: 443   #
           env:
             - name: BaseUrl
               value: "https://api-service.poc-blazor.svc.cluster.local:8080"
-
             - name: Authority
               value: "${AUTHORITY}"
-
             - name: ClientId
               value: "${CLIENT_ID}"
-
             - name: RedirectUri
               value: "${REDIRECT_URI}"
-
             - name: PostLogoutRedirectUri
               value: "${POST_LOGOUT_REDIRECT_URI}"
-
             - name: MetadataUrl
               value: "${METADATA_URL}"
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/nginx/certs   
+              readOnly: true
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: blazor-tls
