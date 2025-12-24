@@ -54,20 +54,20 @@ jobs:
           path: coverage-report
 
       - name: Build Coverage Breakdown
-          id: breakdown
-          run: |
-            if jq -e '.assemblies' coverage-report/Summary.json > /dev/null; then
-              breakdown=$(jq -r '
-                .assemblies[]
-                | "- \(.name): \(.linecoverage)%"
-              ' coverage-report/Summary.json)
-            else
-              breakdown="- Proyecto único: ${{ steps.coverage.outputs.pct }}%"
-            fi
+        id: breakdown
+        run: |
+          if jq -e '.assemblies' coverage-report/Summary.json > /dev/null; then
+            breakdown=$(jq -r '
+              .assemblies[]
+              | "- \(.name): \(.linecoverage)%"
+            ' coverage-report/Summary.json)
+          else
+            breakdown="- Proyecto único: ${{ steps.coverage.outputs.pct }}%"
+          fi
 
-            echo "text<<EOF" >> $GITHUB_OUTPUT
-            echo "$breakdown" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+          echo "text<<EOF" >> $GITHUB_OUTPUT
+          echo "$breakdown" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment Coverage on PR
         if: github.event_name == 'pull_request'
