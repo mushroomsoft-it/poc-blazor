@@ -6,7 +6,9 @@ on:
     paths:
       - "src/Frontend/**"
       - "k8s/frontend-*.yaml"
+      - "k8s/ingress.yaml"
       - ".github/workflows/build-and-push-frontend.yaml"
+      - ".github/workflows/deploy-frontend-eks.yaml"
 
 env:
   REGISTRY: ghcr.io

@@ -4,17 +4,19 @@ metadata:
   name: poc-blazor-ingress
   namespace: poc-blazor
   annotations:
-    kubernetes.io/ingress.class: nginx # o alb si usas AWS ALB Controller
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:422600867425:certificate/ccadfa12-5818-4c26-9907-f959d20390b6
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/redirect-http-to-https: '443'
+    alb.ingress.kubernetes.io/healthcheck-path: /
 spec:
-  tls:
-    - hosts:
-        - dev.n8nmushroomsoft-it.com
-      secretName: blazor-tls  # <--- aquí pones tu secreto de cert-manager
   rules:
     - host: dev.n8nmushroomsoft-it.com
       http:
         paths:
+          # Frontend en /
           - path: /
             pathType: Prefix
             backend:
