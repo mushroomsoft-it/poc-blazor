@@ -23,4 +23,3 @@ ENTRYPOINT ["/entrypoint.sh"]
 COPY --from=build /build/wwwroot /usr/share/nginx/html
 
 EXPOSE 80
-EXPOSE 443

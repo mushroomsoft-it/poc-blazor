@@ -6,11 +6,12 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:422600867425:certificate/ccadfa12-5818-4c26-9907-f959d20390b6
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:422600867425:certificate/9a9e49dd-107b-48d6-b296-8524d39e935d
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
     alb.ingress.kubernetes.io/redirect-http-to-https: '443'
     alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/success-codes: "200,301,302"
 spec:
   rules:
     - host: dev.n8nmushroomsoft-it.com

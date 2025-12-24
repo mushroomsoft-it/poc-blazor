@@ -277,7 +277,7 @@ resource "kubernetes_service_account_v1" "alb_controller_sa" {
 resource "aws_eks_access_entry" "cli_user_entry" {
   cluster_name  = aws_eks_cluster.eks_cluster.name
   principal_arn = "arn:aws:iam::422600867425:user/cli-user"
-  type          = "STANDARD" # STANDARD está bien; ADMIN solo cambia la consola
+  type          = "STANDARD"
 }
 
 resource "aws_eks_access_policy_association" "cli_user_admin" {
