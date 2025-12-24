@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: write
+  pages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -83,6 +87,8 @@ jobs:
 
             ✔ El reporte HTML está disponible en artifacts.  
             _Informe generado automáticamente._
+            ✔ Reporte público:
+            https://github.io/${{ github.repository }}/coverage/
 
       - name: Enforce Coverage Threshold
         run: |
@@ -96,3 +102,13 @@ jobs:
             && echo "❌ Coverage too low" \
             && exit 1 \
             || echo "✅ Coverage OK"
+
+      - name: Deploy coverage report to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: coverage-report
+          destination_dir: coverage
+          keep_files: true
