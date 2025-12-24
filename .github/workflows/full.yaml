@@ -53,13 +53,42 @@ jobs:
           name: coverage-report
           path: coverage-report
 
+      - name: Build Coverage Breakdown
+        id: breakdown
+        run: |
+          breakdown=$(jq -r '
+            .assemblies[]
+            | "- \(.name): \(.linecoverage)%"
+          ' coverage-report/Summary.json)
+
+          echo "text<<EOF" >> $GITHUB_OUTPUT
+          echo "$breakdown" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Comment Coverage on PR
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
             ## 📊 Cobertura de Código
+
             **Total:** `${{ steps.coverage.outputs.pct }}%`
+
+            **Por proyecto:**
+            ${{ steps.breakdown.outputs.text }}
 
             ✔ El reporte HTML está disponible en artifacts.  
             _Informe generado automáticamente._
+
+      - name: Enforce Coverage Threshold
+        run: |
+          MIN_COVERAGE=40
+          ACTUAL_COVERAGE=${{ steps.coverage.outputs.pct }}
+
+          echo "Coverage: $ACTUAL_COVERAGE%"
+          echo "Minimum required: $MIN_COVERAGE%"
+
+          awk "BEGIN {exit !($ACTUAL_COVERAGE < $MIN_COVERAGE)}" \
+            && echo "❌ Coverage too low" \
+            && exit 1 \
+            || echo "✅ Coverage OK"
