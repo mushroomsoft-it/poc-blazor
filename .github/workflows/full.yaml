@@ -87,8 +87,6 @@ jobs:
 
             ✔ El reporte HTML está disponible en artifacts.  
             _Informe generado automáticamente._
-            ✔ Reporte público:
-            https://github.io/${{ github.repository }}/coverage/
 
       - name: Enforce Coverage Threshold
         run: |
