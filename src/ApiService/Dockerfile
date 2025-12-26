@@ -27,4 +27,6 @@ ENV ASPNETCORE_URLS=http://+:8080
 
 EXPOSE 8080
 
+## Entrypoint de la aplicación
+
 ENTRYPOINT ["dotnet", "ApiService.dll"]
