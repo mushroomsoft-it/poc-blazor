@@ -1,4 +1,8 @@
 project_name = "poc-blazor"
+environment  = "development"
+aws_region   = "us-east-1"
+
+cluster_name = "poc-blazor-eks-cluster"
 
 vpc_cidr = "10.0.0.0/16"
 
@@ -14,10 +18,6 @@ public_subnets = [
     name = "eks-public-b"
   }
 ]
-
-environment = "development"
-
-cluster_name = "poc-blazor-eks-cluster"
 
 email = "sfalconi@mushroomsoft-it.com"
 

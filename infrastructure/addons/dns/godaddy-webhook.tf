@@ -10,10 +10,6 @@ resource "kubernetes_secret_v1" "godaddy_api" {
   }
 
   type = "Opaque"
-
-  depends_on = [
-    helm_release.cert_manager
-  ]
 }
 
 resource "helm_release" "godaddy_webhook" {
@@ -29,7 +25,6 @@ resource "helm_release" "godaddy_webhook" {
   ]
 
   depends_on = [
-    helm_release.cert_manager,
     kubernetes_secret_v1.godaddy_api
   ]
 }

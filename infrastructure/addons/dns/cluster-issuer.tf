@@ -1,5 +1,6 @@
 resource "kubernetes_manifest" "letsencrypt_godaddy" {
   provider = kubernetes.eks
+
   manifest = {
     apiVersion = "cert-manager.io/v1"
     kind       = "ClusterIssuer"
@@ -36,7 +37,6 @@ resource "kubernetes_manifest" "letsencrypt_godaddy" {
   }
 
   depends_on = [
-    helm_release.cert_manager,
     helm_release.godaddy_webhook,
     kubernetes_secret_v1.godaddy_api
   ]

@@ -6,8 +6,8 @@ resource "helm_release" "cert_manager" {
   version          = "v1.15.3"
   create_namespace = true
 
-  set = [{ name = "installCRDs", value = "true" }]
-  depends_on = [
-    aws_eks_cluster.eks_cluster
-  ]
+  set = [{
+    name  = "installCRDs"
+    value = "true"
+  }]
 }
