@@ -43,7 +43,6 @@ jobs:
         run: |
           kubectl apply -n dotnet9-app -f k8s/backend-service.yaml
           kubectl apply -n dotnet9-app -f k8s/backend-deployment.yaml
-
       - name: Update API image (rolling update)
         run: |
           echo "Updating API image to: ${{ inputs.image_api }}"
