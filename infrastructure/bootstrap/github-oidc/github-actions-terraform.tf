@@ -56,7 +56,7 @@ resource "aws_iam_policy" "github_terraform_policy" {
           "dynamodb:UpdateItem",
           "dynamodb:DescribeTable"
         ]
-        Resource = "arn:aws:dynamodb:us-east-1:422600867425:table/terraform-locks"
+        Resource = "arn:aws:dynamodb:us-east-1:${data.aws_caller_identity.current.account_id}:table/terraform-locks"
       },
 
       # VPC / Networking
@@ -106,8 +106,8 @@ resource "aws_iam_policy" "github_terraform_policy" {
         Effect = "Allow"
         Action = "iam:PassRole"
         Resource = [
-          "arn:aws:iam::422600867425:role/*eks-node*",
-          "arn:aws:iam::422600867425:role/*eks-cluster*"
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*eks-node*",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*eks-cluster*"
         ]
       },
 
@@ -121,7 +121,7 @@ resource "aws_iam_policy" "github_terraform_policy" {
           "kms:GetKeyRotationStatus",
           "kms:ListResourceTags"
         ]
-        Resource = "arn:aws:kms:us-east-1:422600867425:key/*"
+        Resource = "arn:aws:kms:us-east-1:${data.aws_caller_identity.current.account_id}:key/*"
       },
 
       # ALB / Logs

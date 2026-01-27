@@ -21,3 +21,7 @@ variable "email" {
   type    = string
   default = null
 }
+
+variable "cli_user_name" {
+  type = string
+}

@@ -49,3 +49,7 @@ variable "godaddy_api_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "cli_user_name" {
+  type = string
+}

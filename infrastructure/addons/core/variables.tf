@@ -1,15 +1,14 @@
 variable "aws_region" {
   type    = string
-  default = "us-east-1"
 }
 
-variable "godaddy_api_key" {
-  type = string
-}
+# variable "godaddy_api_key" {
+#   type = string
+# }
 
-variable "godaddy_api_secret" {
-  type = string
-}
+# variable "godaddy_api_secret" {
+#   type = string
+# }
 
 variable "project_name" {
   type = string
