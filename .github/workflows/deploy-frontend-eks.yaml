@@ -15,7 +15,7 @@ on:
       image_frontend:
         description: "Frontend image tag for EKS"
         required: true
-        default: "ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest"
+        default: "ghcr.io/sfalconi2001/poc-telemetry-managed-frontend:latest"
 
 permissions:
   id-token: write
@@ -30,12 +30,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug info
-        run: |
-          echo "Repository: $GITHUB_REPOSITORY"
-          echo "Ref: $GITHUB_REF"
-          echo "Frontend Image: ${{ inputs.image_frontend }}"
-
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -45,17 +39,15 @@ jobs:
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name poc-blazor-eks-cluster --region us-east-1
 
-      - name: Ensure namespace exists
-        run: kubectl apply -f k8s/namespace.yaml
-
-      - name: Ensure frontend service & ingress exist
+      - name: Apply frontend manifests
         run: |
-          kubectl apply -f k8s/frontend-deployment.yaml
-          kubectl apply -f k8s/frontend-service.yaml
-          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -n dotnet9-app -f k8s/frontend-deployment.yaml
+          kubectl apply -n dotnet9-app -f k8s/frontend-service.yaml
+          kubectl apply -n dotnet9-app -f k8s/ingress.yaml
 
       - name: Update frontend image (rolling update)
         run: |
           echo "Updating frontend image to: ${{ inputs.image_frontend }}"
-          kubectl -n poc-blazor set image deployment/frontend frontend=${{ inputs.image_frontend }}
-          kubectl -n poc-blazor rollout status deployment/frontend --timeout=120s
+          kubectl -n dotnet9-app set image deployment/frontend-deployment \
+            frontend=${{ inputs.image_frontend }}
+          kubectl -n dotnet9-app rollout status deployment/frontend-deployment --timeout=120s
