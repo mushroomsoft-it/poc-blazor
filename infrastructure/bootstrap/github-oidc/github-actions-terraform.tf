@@ -13,7 +13,7 @@ resource "aws_iam_role" "github_terraform_role" {
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:sfalconi2001/poc-telemetry-managed:*"
+          "token.actions.githubusercontent.com:sub" = "repo:mushroomsoft/poc-blazor:*"
         }
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
