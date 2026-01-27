@@ -1,27 +1,36 @@
+data "aws_caller_identity" "current" {}
+
 data "terraform_remote_state" "eks" {
-  backend = "local"
+  backend = "s3"
 
   config = {
-    path = "../../eks/terraform.tfstate"
+    bucket = "tf-state-poc-telemetry"
+    key    = "eks/terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
 data "terraform_remote_state" "access" {
-  backend = "local"
+  backend = "s3"
 
   config = {
-    path = "../../access/terraform.tfstate"
+    bucket = "tf-state-poc-telemetry"
+    key    = "access/terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
 data "terraform_remote_state" "network" {
-  backend = "local"
+  backend = "s3"
 
   config = {
-    path = "../../network/terraform.tfstate"
+    bucket = "tf-state-poc-telemetry"
+    key    = "network/terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
 
-data "aws_caller_identity" "current" {}
+
+
 

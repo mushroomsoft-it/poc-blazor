@@ -1,3 +1,5 @@
+# Bootstrap role - used only once to setup Terraform backend and CI/CD roles
+
 resource "aws_iam_role" "terraform_role" {
   name = "Terraform-EKS-Role"
   assume_role_policy = jsonencode({

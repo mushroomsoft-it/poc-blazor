@@ -1,11 +1,3 @@
-data "terraform_remote_state" "network" {
-  backend = "local"
-
-  config = {
-    path = "../network/terraform.tfstate"
-  }
-}
-
 resource "aws_iam_role" "eks_cluster_role" {
   name = "${var.project_name}-eks-cluster-role"
 
