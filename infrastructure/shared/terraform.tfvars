@@ -22,3 +22,5 @@ public_subnets = [
 email = "sfalconi@mushroomsoft-it.com"
 
 cli_user_name = "sfalconi"
+
+cli_user_name_2 = "caronate"

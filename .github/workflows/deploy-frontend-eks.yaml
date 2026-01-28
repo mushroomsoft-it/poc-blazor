@@ -15,7 +15,7 @@ on:
       image_frontend:
         description: "Frontend image tag for EKS"
         required: true
-        default: "ghcr.io/sfalconi2001/poc-telemetry-managed-frontend:latest"
+        default: "ghcr.io/mushroomsoft/poc-blazor-frontend:latest"
 
 permissions:
   id-token: write

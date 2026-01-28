@@ -1,5 +1,4 @@
 name: Build and publish Frontend Docker image
-
 on:
   push:
     branches: ["enable-https"]

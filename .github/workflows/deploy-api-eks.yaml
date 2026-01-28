@@ -15,7 +15,7 @@ on:
       image_api:
         description: "API image tag for EKS"
         required: true
-        default: "ghcr.io/sfalconi2001/poc-telemetry-managed-api:latest"
+        default: "ghcr.io/mushroomsoft/poc-blazor-api:latest"
 
 permissions:
   id-token: write
@@ -41,11 +41,11 @@ jobs:
 
       - name: Apply API manifests
         run: |
-          kubectl apply -n dotnet9-app -f k8s/backend-service.yaml
-          kubectl apply -n dotnet9-app -f k8s/backend-deployment.yaml
+          kubectl apply -n dotnet9-app -f k8s/api-service.yaml
+          kubectl apply -n dotnet9-app -f k8s/api-deployment.yaml
       - name: Update API image (rolling update)
         run: |
           echo "Updating API image to: ${{ inputs.image_api }}"
-          kubectl -n dotnet9-app set image deployment/backend-deployment \
-            backend=${{ inputs.image_api }}
-          kubectl -n dotnet9-app rollout status deployment/backend-deployment --timeout=120s
+          kubectl -n dotnet9-app set image deployment/api-deployment \
+            api=${{ inputs.image_api }}
+          kubectl -n dotnet9-app rollout status deployment/api-deployment --timeout=120s

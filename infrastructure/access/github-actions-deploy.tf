@@ -11,10 +11,7 @@ resource "aws_iam_role" "github_deploy_role" {
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = [
-            "repo:mushroomsoft/poc-blazor:ref:refs/heads/*",
-            "repo:mushroomsoft/poc-blazor:workflow:*"
-          ]
+          "token.actions.githubusercontent.com:sub" = "repo:mushroomsoft/poc-blazor:*"
         }
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
@@ -38,7 +35,7 @@ resource "aws_iam_policy" "github_deploy_policy" {
           "eks:DescribeCluster",
           "eks:AccessKubernetesApi"
         ]
-        Resource = "arn:aws:eks:us-east-1:422600867425:cluster/poc-blazor-eks-cluster"
+        Resource = "arn:aws:eks:us-east-1:${data.aws_caller_identity.current.account_id}:cluster/poc-blazor-eks-cluster"
       }
     ]
   })

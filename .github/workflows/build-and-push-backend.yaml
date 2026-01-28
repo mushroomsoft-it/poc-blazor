@@ -1,5 +1,4 @@
 name: Build and publish Api Docker image
-
 on:
   push:
     branches: ["enable-https"]
