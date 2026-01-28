@@ -11,7 +11,7 @@ resource "aws_iam_role" "github_deploy_role" {
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:mushroomsoft/poc-blazor:*"
+          "token.actions.githubusercontent.com:sub" = "repo:mushroomsoft-it/poc-blazor:*"
         }
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
