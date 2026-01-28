@@ -35,7 +35,7 @@ resource "aws_iam_policy" "github_deploy_policy" {
           "eks:DescribeCluster",
           "eks:AccessKubernetesApi"
         ]
-        Resource = "arn:aws:eks:us-east-1:${data.aws_caller_identity.current.account_id}:cluster/${data.terraform_remote_state.eks.outputs.eks_cluster_name}"
+        Resource = "arn:aws:eks:${var.aws_region}:${data.aws_caller_identity.current.account_id}:cluster/${var.cluster_name}"
       }
     ]
   })
@@ -53,7 +53,7 @@ resource "aws_eks_access_entry" "github" {
 }
 
 resource "aws_eks_access_policy_association" "github_edit" {
-  cluster_name  = "poc-blazor-eks-cluster"
+  cluster_name  = data.terraform_remote_state.eks.outputs.cluster_name
   principal_arn = aws_iam_role.github_deploy_role.arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSEditPolicy"
 

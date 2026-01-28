@@ -95,7 +95,10 @@ test/*/TestResults/
 *.backup
 .terraform/
 .terraform.lock.hcl
-
-.tfvars
+*.tfvars
 *.tfvars.json
+*auto.tfvars
 
+# Kubernetes secrets
+k8s/secrets/
+*.secret.yaml

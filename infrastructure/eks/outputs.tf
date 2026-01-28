@@ -8,10 +8,12 @@ output "cluster_endpoint" {
 
 output "cluster_ca" {
   value = aws_eks_cluster.this.certificate_authority[0].data
+  sensitive = true
 }
 
 output "cluster_arn" {
   value = aws_eks_cluster.this.arn
+  sensitive = true
 }
 
 output "eks_cluster_role_arn" {

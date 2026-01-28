@@ -44,3 +44,8 @@ variable "application_namespace" {
   description = "Kubernetes namespace for the application"
   type = string
 }
+
+variable "cluster_name" {
+  description = "EKS Cluster Name"
+  type        = string
+}
