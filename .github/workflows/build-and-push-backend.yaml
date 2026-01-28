@@ -1,7 +1,7 @@
 name: Build and publish Api Docker image
 on:
   push:
-    branches: ["enable-https"]
+    branches: ["main"]
     paths:
       - "src/ApiService/**"
       - "k8s/api-*.yaml"
