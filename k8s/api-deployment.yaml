@@ -22,5 +22,9 @@ spec:
           env:
             - name: CorsOrigins
               value: "*"
+
             - name: ConnectionStrings__DefaultConnection
-              value: "Host=postgres.poc-blazor.svc.cluster.local;Port=5432;Database=pocblazordb;Username=postgres;Password=postgres123"
+              valueFrom:
+                secretKeyRef:
+                  name: api-db-secret
+                  key: DB_CONNECTION_STRING
