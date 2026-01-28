@@ -13,7 +13,7 @@ resource "aws_iam_role" "github_terraform_role" {
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:mushroomsoft-it/poc-blazor:*"
+          "token.actions.githubusercontent.com:sub" = "repo:${var.repository_owner}/${var.repository_name}:*"
         }
         StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
@@ -30,8 +30,6 @@ resource "aws_iam_policy" "github_terraform_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-
-      # Terraform backend (S3)
       {
         Effect = "Allow"
         Action = [
@@ -45,8 +43,6 @@ resource "aws_iam_policy" "github_terraform_policy" {
           "arn:aws:s3:::tf-state-poc-telemetry/*"
         ]
       },
-
-      # Terraform locking (DynamoDB)
       {
         Effect = "Allow"
         Action = [
@@ -58,22 +54,16 @@ resource "aws_iam_policy" "github_terraform_policy" {
         ]
         Resource = "arn:aws:dynamodb:us-east-1:${data.aws_caller_identity.current.account_id}:table/terraform-locks"
       },
-
-      # VPC / Networking
       {
         Effect   = "Allow"
         Action   = ["ec2:*"]
         Resource = "*"
       },
-
-      # EKS
       {
         Effect   = "Allow"
         Action   = ["eks:*"]
         Resource = "*"
       },
-
-      # IAM (ahora con permisos completos para Terraform)
       {
         Effect = "Allow"
         Action = [

@@ -25,3 +25,5 @@ variable "kubernetes_version" {
 }
 
 variable "vpc_cidr" {}
+
+

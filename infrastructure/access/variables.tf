@@ -29,3 +29,18 @@ variable "cli_user_name" {
 variable "cli_user_name_2" {
   type = string
 }
+
+variable "repository_owner" {
+  description = "GitHub repository owner"
+  type        = string
+}
+
+variable "repository_name" {
+  description = "GitHub repository name"
+  type        = string
+}
+
+variable "application_namespace" {
+  description = "Kubernetes namespace for the application"
+  type = string
+}

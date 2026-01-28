@@ -24,3 +24,9 @@ email = "sfalconi@mushroomsoft-it.com"
 cli_user_name = "sfalconi"
 
 cli_user_name_2 = "caronate"
+
+repository_owner = "mushroomsoft-it"
+
+application_namespace = "poc-blazor"
+
+repository_name = "poc-blazor"
