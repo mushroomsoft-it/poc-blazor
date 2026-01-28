@@ -28,7 +28,8 @@ resource "aws_kms_key" "eks_secrets" {
           "kms:Decrypt",
           "kms:ReEncrypt*",
           "kms:GenerateDataKey*",
-          "kms:DescribeKey"
+          "kms:DescribeKey",
+          "kms:CreateGrant"
         ]
         Resource = "*"
       }
