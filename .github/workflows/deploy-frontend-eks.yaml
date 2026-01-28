@@ -15,7 +15,7 @@ on:
       image_frontend:
         description: "Frontend image tag for EKS"
         required: true
-        default: "ghcr.io/mushroomsoft/poc-blazor-frontend:latest"
+        default: "ghcr.io/mushroomsoft-it/poc-blazor-frontend:latest"
 
 permissions:
   id-token: write

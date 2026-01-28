@@ -15,7 +15,7 @@ on:
       image_api:
         description: "API image tag for EKS"
         required: true
-        default: "ghcr.io/mushroomsoft/poc-blazor-api:latest"
+        default: "ghcr.io/mushroomsoft-it/poc-blazor-api:latest"
 
 permissions:
   id-token: write
