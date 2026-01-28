@@ -41,11 +41,11 @@ jobs:
 
       - name: Apply API manifests
         run: |
-          kubectl apply -n dotnet9-app -f k8s/api-service.yaml
-          kubectl apply -n dotnet9-app -f k8s/api-deployment.yaml
+          kubectl apply -n poc-blazor -f k8s/api-service.yaml
+          kubectl apply -n poc-blazor -f k8s/api-deployment.yaml
       - name: Update API image (rolling update)
         run: |
           echo "Updating API image to: ${{ inputs.image_api }}"
-          kubectl -n dotnet9-app set image deployment/api-deployment \
+          kubectl -n poc-blazor set image deployment/api-deployment \
             api=${{ inputs.image_api }}
-          kubectl -n dotnet9-app rollout status deployment/api-deployment --timeout=120s
+          kubectl -n poc-blazor rollout status deployment/api-deployment --timeout=120s
