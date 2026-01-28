@@ -49,4 +49,4 @@ jobs:
           echo "Updating frontend image to: ${{ inputs.image_frontend }}"
           kubectl -n poc-blazor set image deployment/frontend-deployment \
             frontend=${{ inputs.image_frontend }}
-          kubectl -n poc-blazor rollout status deployment/frontend-deployment --timeout=120s
+          kubectl -n poc-blazor rollout status deployment/frontend --timeout=120s
