@@ -59,6 +59,6 @@ resource "aws_eks_access_policy_association" "github_edit" {
 
   access_scope {
     type       = "namespace"
-    namespaces = ["dotnet9-app"]
+    namespaces = ["poc-blazor"]
   }
 }
