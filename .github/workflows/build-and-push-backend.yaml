@@ -1,12 +1,12 @@
 name: Build and publish Api Docker image
-
 on:
   push:
-    branches: ["eks-test"]
+    branches: ["main"]
     paths:
       - "src/ApiService/**"
       - "k8s/api-*.yaml"
-
+      - ".github/workflows/build-and-push-backend.yaml"
+      - ".github/workflows/deploy-api-eks.yaml"
 env:
   REGISTRY: ghcr.io
 

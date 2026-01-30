@@ -21,7 +21,7 @@ spec:
             - containerPort: 80
           env:
             - name: BaseUrl
-              value: "http://api-service.poc-blazor.svc.cluster.local:80"
+              value: "http://api.poc-blazor.svc.cluster.local:80"
 
             - name: Authority
               value: "${AUTHORITY}"

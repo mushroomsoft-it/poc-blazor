@@ -6,22 +6,17 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:815219013935:certificate/50691cb5-3ce9-4e0e-b447-e8afcffbfbc7
     alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
-    alb.ingress.kubernetes.io/healthcheck-path: /weatherforecast
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/redirect-http-to-https: '443'
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/success-codes: "200,301,302"
 spec:
   rules:
-    - http:
+    - host: dev.n8nmushroomsoft-it.com
+      http:
         paths:
-          # Backend en /weatherforecast
-          - path: /weatherforecast
-            pathType: Prefix
-            backend:
-              service:
-                name: api-service
-                port:
-                  number: 8080
-
           # Frontend en /
           - path: /
             pathType: Prefix

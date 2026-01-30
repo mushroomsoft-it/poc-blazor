@@ -39,17 +39,13 @@ jobs:
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name poc-blazor-eks-cluster --region us-east-1
 
-      - name: Ensure namespace exists
-        run: kubectl apply -f k8s/namespace.yaml
-
-      - name: Ensure API service exists
-        run: kubectl apply -f k8s/api-service.yaml
-
-      - name: Ensure API deployment exists
-        run: kubectl apply -f k8s/api-deployment.yaml
-
+      - name: Apply API manifests
+        run: |
+          kubectl apply -n poc-blazor -f k8s/api-service.yaml
+          kubectl apply -n poc-blazor -f k8s/api-deployment.yaml
       - name: Update API image (rolling update)
         run: |
           echo "Updating API image to: ${{ inputs.image_api }}"
-          kubectl -n poc-blazor set image deployment/api-service api-service=${{ inputs.image_api }}
-          kubectl -n poc-blazor rollout status deployment/api-service --timeout=120s
+          kubectl -n poc-blazor set image deployment/api \
+            api=${{ inputs.image_api }}
+          kubectl -n poc-blazor rollout status deployment/api --timeout=120s

@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-service
+  name: api
   namespace: poc-blazor
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: api-service
+      app: api
   template:
     metadata:
       labels:
-        app: api-service
+        app: api
     spec:
       containers:
-        - name: api-service
+        - name: api
           image: ghcr.io/mushroomsoft-it/poc-blazor-api:latest
           imagePullPolicy: Always
           ports:
@@ -22,5 +22,9 @@ spec:
           env:
             - name: CorsOrigins
               value: "*"
+
             - name: ConnectionStrings__DefaultConnection
-              value: "Host=postgres.poc-blazor.svc.cluster.local;Port=5432;Database=pocblazordb;Username=postgres;Password=postgres123"
+              valueFrom:
+                secretKeyRef:
+                  name: api-db-secret
+                  key: DB_CONNECTION_STRING
