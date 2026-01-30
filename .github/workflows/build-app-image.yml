@@ -1,0 +1,72 @@
+name: Build Frontend Docker Image and Push to GitHub Container Registry
+
+on:
+    push:
+        branches: ["main"]
+        paths:
+            - "src/Frontend/**"
+
+permissions:
+    contents: read
+    packages: write
+
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository_owner }}/poc-blazor-app:build-${{ github.run_id }}
+
+jobs:
+    build_app_and_push_image:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: "9.0.x"
+
+            - name: Publish Frontend
+              run: |
+                  dotnet restore src/Frontend/Frontend.csproj
+                  dotnet build src/Frontend/Frontend.csproj -c Release
+                  dotnet publish src/Frontend/Frontend.csproj -c Release -o src/Frontend/publish
+
+            - name: Create certs folder
+              run: mkdir -p src/Frontend/certs
+
+            - name: Add blazor.crt
+              run: echo "${{ secrets.Blazor_CRT }}" > src/Frontend/certs/blazor.crt
+
+            - name: Add blazor.key
+              run: echo "${{ secrets.Blazor_KEY }}" > src/Frontend/certs/blazor.key
+
+            - name: Log in to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build & Push Docker image
+              uses: docker/build-push-action@v4
+              with:
+                  context: src/Frontend
+                  file: src/Frontend/Dockerfile
+                  push: true
+                  tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+            - name: Verify Frontend Docker image
+              run: |
+                  docker run -d --name test-blazor -p 8080:80 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+                  sleep 10
+                  echo "=== Docker PS ==="
+                  docker ps
+                  echo "=== Docker Logs ==="
+                  docker logs test-blazor
+                  echo "=== Curl Test ==="
+                  curl -I http://localhost:8080 || echo "Frontend did not respond"
+                  docker stop test-blazor
+                  docker rm test-blazor
+
+            - name: Log out from GitHub Container Registry
+              run: docker logout ${{ env.REGISTRY }}
