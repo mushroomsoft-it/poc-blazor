@@ -72,3 +72,14 @@ variable "repository_name" {
   description = "GitHub repository name"
   type        = string
 }
+
+variable "subdomain_name" {
+  description = "Root domain name for the application"
+  type        = string
+}
+
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
+}

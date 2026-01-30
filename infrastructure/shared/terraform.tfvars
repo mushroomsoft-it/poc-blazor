@@ -30,3 +30,10 @@ repository_owner = "mushroomsoft-it"
 application_namespace = "poc-blazor"
 
 repository_name = "poc-blazor"
+
+subdomain_name = "dev.n8nmushroomsoft-it.com"
+
+tags = {
+  Project     = "poc-blazor"
+  Environment = "development"
+}

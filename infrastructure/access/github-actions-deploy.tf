@@ -47,7 +47,7 @@ resource "aws_iam_role_policy_attachment" "github_deploy_policy_attachment" {
 }
 
 resource "aws_eks_access_entry" "github" {
-  cluster_name  = data.terraform_remote_state.eks.outputs.eks_cluster_name
+  cluster_name  = data.terraform_remote_state.eks.outputs.cluster_name
   principal_arn = aws_iam_role.github_deploy_role.arn
   type          = "STANDARD"
 }
